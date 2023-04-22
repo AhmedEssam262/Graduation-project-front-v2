@@ -45,6 +45,7 @@ const AppointmentCard = ({
   fetchSlotsData,
   fetchUserData,
   socket,
+  admin,
 }) => {
   const [showAction, setShowAction] = useState(false);
   const [showActionDelay, setShowActionDelay] = useState(false);
@@ -54,7 +55,11 @@ const AppointmentCard = ({
   }, [showAction]);
   return (
     <div
-      className={`flex flex-col relative sm:w-1/3 lg:w-1/4 2xl:w-1/5 grow justify-between rounded-lg ${getAppointmentVal(
+      className={`${
+        !admin
+          ? "flex flex-col m:w-1/3 lg:w-1/4 2xl:w-1/5 grow justify-between"
+          : ""
+      } relative rounded-lg ${getAppointmentVal(
         appointmentState,
         "bg-gray-800/80",
         "bg-yellow-800/80",
@@ -72,7 +77,7 @@ const AppointmentCard = ({
             !showAction ? "h-0" : showActionDelay ? "h-full" : "h-0"
           } w-full overflow-hidden transition-all bg-green-400/50 left-0 top-0 rounded-lg`}
         >
-          {appointmentState == "free" && (
+          {appointmentState == "free" && !admin && (
             <div
               onClick={() => {
                 setIsEdit(order);
@@ -112,7 +117,8 @@ const AppointmentCard = ({
                   [appointmentId],
                   null,
                   null,
-                  socket
+                  socket,
+                  userid
                 )
               }
               className="flex cursor-pointer items-center bg-red-700/60 hover:bg-red-700/80 grow gap-1 justify-center"

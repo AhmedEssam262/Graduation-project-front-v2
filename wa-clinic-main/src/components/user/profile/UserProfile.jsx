@@ -112,6 +112,7 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
   /* ================================================  Authorization part   ===========================================================*/
   const profileId = profileData?.["user"]?.user_id;
   const isVisitor = userid ? false : true;
+  const isAdmin = profileData?.["user"]?.user_type == "admin";
   const isUser = profileData?.["user"]?.user_type == "doctor" ? false : true; // check user profile
   const isAuth = userid && profileId == userid ? true : false; // user visit his profile
   const isProfile = profileData?.["user"];
@@ -181,7 +182,7 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
                       fontFamily: "sans-serif",
                     }}
                   >
-                    {!isUser ? "Dr. " : " "}
+                    {!isUser ? "Dr. " : ""}
                     {userValues?.nickname}
                   </Title>
                   {!isAuth ? (
@@ -432,7 +433,7 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
             </div>
           </div>
           <div className="mt-2">
-            {isUser ? (
+            {isUser && !isAdmin ? (
               <div>
                 <PatientRecords
                   isAuth={isAuth}

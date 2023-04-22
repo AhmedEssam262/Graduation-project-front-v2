@@ -9,13 +9,13 @@ const scheduleAppointments = (
   fetchSlotsData,
   userid,
   fetchUserData,
-  isDone,
+  setIsDone,
   deletedAppointments,
   isEdit,
   editSlot,
-  socket
+  socket,
+  doctorId
 ) => {
-  if (!deletedAppointments) isDone = true;
   messageApi.open({
     key: 1,
     type: "loading",
@@ -36,10 +36,11 @@ const scheduleAppointments = (
       deletedAppointments,
       addedAppointments,
       editSlot: editSlot,
+      doctorId,
       // addSlots,
     },
   };
-  isDone = false;
+  if (!deletedAppointments) setIsDone(false);
   const host = window?.location?.hostname;
   axios
     .post(
@@ -66,7 +67,7 @@ const scheduleAppointments = (
 
         duration: 3,
       });
-      socket.emit("update_appointments", {
+      socket?.emit("update_appointments", {
         date: activeDate?.format("YYYY-MM-DD"),
         doctorId: userid,
       });
@@ -105,7 +106,7 @@ const scheduleAppointments = (
           content: "there's some issues, please try again later",
           duration: 3,
         });
-        if (!deletedAppointments) isDone = true;
+        if (!deletedAppointments) setIsDone(true);
       }
     });
 };

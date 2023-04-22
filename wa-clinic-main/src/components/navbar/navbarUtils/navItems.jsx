@@ -504,7 +504,7 @@ const items = (
       )
     : null,
   ,
-  user
+  user && user?.user_type !== "admin"
     ? getItem(
         <Link to="/appointments" className="select-none">
           My Appointment

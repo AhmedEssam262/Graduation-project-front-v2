@@ -7,6 +7,7 @@ import {
   useContext,
   useLayoutEffect,
   useReducer,
+  useCallback,
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "universal-cookie";
@@ -24,6 +25,7 @@ const UserContextProvider = ({ children, token }) => {
   const fetchUserData = async (active, directToken, directError, noRender) => {
     if (!noRender) setIsLoading(true);
     if (!token && !active) {
+      console.log("reset");
       setUserData(null);
       return setIsLoading(false);
     }
@@ -39,24 +41,23 @@ const UserContextProvider = ({ children, token }) => {
       return data;
     } catch (err) {
       const msg = err?.response?.data?.data?.name;
-      // setIsError(
-      //   err?.response?.status == 500 || err?.message == "Network Error"
-      //     ? true
-      //     : false
-      // );
       switch (msg) {
         case "TokenExpiredError":
-          setTokenExpired(true);
-          // window.localStorage.removeItem("user");
+          let userData;
+          setUserData((dat) => {
+            userData = dat;
+            return dat;
+          });
           if (userData && !location?.pathname.includes("login")) {
+            setTokenExpired(true);
             messageApi.open({
               key: 1,
               type: "error",
               content: "your Time has Expired, Redirecting to login page ...",
               duration: 3,
             });
-            setUserData(null);
             setTimeout(() => {
+              setUserData(null);
               navigate(`/login?redirect=${location?.pathname}`);
             }, 3000);
           }
@@ -76,21 +77,25 @@ const UserContextProvider = ({ children, token }) => {
     }
   };
   useLayoutEffect(() => {
-    fetchUserData();
-    // if()
+    fetchUserData(true, new Cookies().get("accessToken"));
+  }, []);
+  useLayoutEffect(() => {
+    let timeId;
     const handleExpired = async () => {
       try {
         const record = jwtDecode(new Cookies().get("accessToken"));
-        //fetchUserData(true)
-        setTimeout(
-          () =>
-            fetchUserData(true, new Cookies().get("accessToken"), null, true),
-          Math.abs(+(record?.exp + "000") - Date.now())
-        );
-      } catch (err) {}
+        timeId = setTimeout(() => {
+          fetchUserData(true, new Cookies().get("accessToken"), null, true);
+        }, Math.abs(+(record?.exp + "000") - Date.now()));
+      } catch (err) {
+        //     console.log(err, "err");
+      }
     };
     handleExpired();
-  }, []);
+    return () => {
+      clearTimeout(timeId);
+    };
+  }, [new Cookies().get("accessToken")]);
   return (
     <UserData.Provider
       value={{

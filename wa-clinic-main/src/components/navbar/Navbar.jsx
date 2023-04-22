@@ -49,7 +49,10 @@ const Navbar = ({
   }, [isMobile]);
   return (
     !(
-      (isMobile && location.pathname.includes("/chat"))
+      (
+        (isMobile && location.pathname.includes("/chat")) ||
+        location.pathname.includes("/admin")
+      )
       // ||
       //(location.pathname.includes("/dashboard") &&
       //window.localStorage.getItem("dashType") == "chat")

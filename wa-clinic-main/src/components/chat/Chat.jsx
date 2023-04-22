@@ -17,7 +17,7 @@ import {
 import { Link } from "react-router-dom";
 import { AiOutlineArrowLeft, AiOutlineArrowUp } from "react-icons/ai";
 
-const Chat = ({ isChat, fetchUserData, user, messageApi, socket }) => {
+const Chat = ({ isAdmin, isChat, fetchUserData, user, messageApi, socket }) => {
   const { fetchChatData, chatData, isLoading } = useChatContext();
   const isMobile = useMediaQuery({
     query: "(max-width:678px)",
@@ -27,6 +27,9 @@ const Chat = ({ isChat, fetchUserData, user, messageApi, socket }) => {
   );
   useEffect(() => {
     const cookies = new Cookies();
+    if (user?.user_id) {
+      socket.emit("join_user", user.user_id);
+    }
     const fetchChat = () => {
       fetchChatData(
         true,
@@ -44,11 +47,6 @@ const Chat = ({ isChat, fetchUserData, user, messageApi, socket }) => {
     return () => socket.off("new_chat", fetchChat);
   }, []);
   useEffect(() => {
-    if (user?.user_id) {
-      socket.emit("join_user", user.user_id);
-    }
-  }, [user]);
-  useEffect(() => {
     if (withUser) window.localStorage.setItem("chatTo", withUser);
   }, [withUser]);
   const chatRecord = chatData?.find(({ user_id }) => user_id == withUser);
@@ -56,7 +54,13 @@ const Chat = ({ isChat, fetchUserData, user, messageApi, socket }) => {
   return (
     <div
       style={{
-        height: isMobile ? "100vh" : isChat ? "100vh" : "calc(100vh - 51.2px)",
+        height: isAdmin
+          ? `calc(100vh - 65px)`
+          : isMobile
+          ? "100vh"
+          : isChat
+          ? "100vh"
+          : "calc(100vh - 51.2px)",
       }}
       className={`flex ${isMobile && "flex-col"}`}
     >
@@ -148,14 +152,16 @@ const Chat = ({ isChat, fetchUserData, user, messageApi, socket }) => {
               <span className="text-gray-700 font-medium text-xl">
                 No Users
               </span>
-              <BsPersonPlus
-                fill="#103155"
-                style={{
-                  fontSize: isMobile ? "125px" : "150px",
-                }}
-              />
+              <Link to="/doctors">
+                <BsPersonPlus
+                  fill="#103155"
+                  style={{
+                    fontSize: isMobile ? "125px" : "150px",
+                  }}
+                />
+              </Link>
               <Link
-                to="/doctor"
+                to="/doctors"
                 className="p-3 sm:p-4 text-xl sm:text-3xl rounded-lg !text-white bg-gray-800 hover:bg-gray-900 rouned"
               >
                 Chat with doctor Now

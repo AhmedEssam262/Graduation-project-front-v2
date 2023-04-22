@@ -15,10 +15,10 @@ import HeaderLine from "../sign/signup/signupUtils/HeaderLine";
 import Appointments from "../appointments/Appointments";
 import AppointmentContextProvider from "../../contexts/AppointmentContextProvider";
 import Chat from "../chat/Chat";
+import Loader from "../Loader";
 const DoctorDashboard = ({
   user,
   fetchUserData,
-  isError,
   isUserLoading,
   messageApi,
   socket,
@@ -46,6 +46,7 @@ const DoctorDashboard = ({
   useEffect(() => {
     return () => setNavActive(true);
   }, []);
+  const isVerified = dashboardData?.is_verified;
   return (
     <div className={`${isMobile ? "flex" : ""} grow overflow-hidden  w-full`}>
       <DashNav setDashType={setDashType} dashType={dashType} />
@@ -54,6 +55,7 @@ const DoctorDashboard = ({
           <div className="flex flex-col h-full grow overflow-hidden">
             <ProfileContextProvider>
               <UserProfile
+                isVerified={isVerified}
                 userid={userid}
                 fetchUserData={fetchUserData}
                 isUserLoading={isUserLoading}
@@ -64,6 +66,7 @@ const DoctorDashboard = ({
           <div className="bg-white h-full">
             <SlotsContextProvider>
               <ScheduleAppointments
+                isDoctorLoading={isLoading}
                 socket={socket}
                 doctorData={dashboardData}
                 setDashType={setDashType}
@@ -84,7 +87,6 @@ const DoctorDashboard = ({
               setDashType={setDashType}
               messageApi={messageApi}
               user={user}
-              isError={isError}
               fetchUserData={fetchUserData}
               fromDash={true}
             />

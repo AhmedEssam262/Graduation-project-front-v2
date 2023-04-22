@@ -35,6 +35,8 @@ const UserItem = ({ user, setUserData, messageApi }) => {
           to={
             user?.user_type == "user"
               ? `/profile/${user?.user_name}`
+              : user?.user_type == "admin"
+              ? `/admin`
               : `/dashboard`
           }
           className="text-white grow inline-block

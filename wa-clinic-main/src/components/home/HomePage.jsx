@@ -1,6 +1,6 @@
 import React from "react";
 import millify from "millify";
-import { Typography, Row, Col, Statistic, Rate } from "antd";
+import { Typography, Row, Col, Statistic, Rate, Avatar } from "antd";
 import { useMediaQuery } from "react-responsive";
 import { Link } from "react-router-dom";
 import Cryptocurrencies from "../user/doctors/Doctors";
@@ -22,6 +22,8 @@ import { AiOutlineSchedule } from "react-icons/ai";
 import { BsFillChatSquareTextFill } from "react-icons/bs";
 import { GiDoctorFace } from "react-icons/gi";
 import { RiQuestionAnswerLine } from "react-icons/ri";
+import { MdDashboard } from "react-icons/md";
+import { ImProfile } from "react-icons/im";
 const { Title } = Typography;
 const HomePage = ({ socket, user }) => {
   const { homeData, isLoading } = useHomeContext();
@@ -75,7 +77,6 @@ const HomePage = ({ socket, user }) => {
       value: globalStats?.totalReviews,
     },
   ];
-  if (isLoading) return <Loader />;
   return (
     <>
       <div
@@ -100,7 +101,41 @@ const HomePage = ({ socket, user }) => {
         </h1>
         {user && (
           <div className="flex gap-8 mt-2 justify-center px-2">
-            <div className="w-1/2">
+            <div className="w-5/6">
+              <Arrow />
+              <div className="mt-2">
+                <Link
+                  className="p-2 py-4 !bg-blue-900 hover:!text-white text-center hover:!bg-blue-500 !text-xs sm:!text-base !block rounded-lg !bg-blue-400 font-medium text-gray-100"
+                  to={
+                    user?.user_type == "user"
+                      ? `/profile/${user?.user_name}`
+                      : user?.user_type == "admin"
+                      ? `/admin`
+                      : `/dashboard`
+                  }
+                >
+                  {user?.img_url ? (
+                    <Avatar src={user.img_url} size="large" />
+                  ) : user?.user_type == "user" ? (
+                    <ImProfile className="mb-2 flex justify-center items-center w-full !text-lg sm:!text-2xl" />
+                  ) : (
+                    <MdDashboard className="mb-2 flex justify-center items-center w-full !text-lg sm:!text-2xl" />
+                  )}
+                  {user?.user_type == "user"
+                    ? `My Profile`
+                    : user?.user_type == "admin"
+                    ? `My Admin Dashboard`
+                    : `My Doctor Dashboard`}
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+        {user && (
+          <div className="flex gap-8 mt-2 justify-center px-2">
+            <div
+              className={`${user?.user_type == "admin" ? "w-4/5" : "w-1/2"}`}
+            >
               <Arrow />
               <div className="mt-2">
                 <Link
@@ -112,18 +147,20 @@ const HomePage = ({ socket, user }) => {
                 </Link>
               </div>
             </div>
-            <div className="w-1/2">
-              <Arrow />
-              <div className="mt-2">
-                <Link
-                  className="p-2 py-4 !bg-blue-700 hover:!text-white text-center hover:!bg-blue-600 !text-xs sm:!text-base !block rounded-lg !bg-blue-400 font-medium text-gray-100"
-                  to="/appointments"
-                >
-                  <AiOutlineSchedule className="mb-2 flex justify-center items-center w-full !text-lg sm:!text-2xl" />
-                  Your Appointments
-                </Link>
+            {user.user_type !== "admin" && (
+              <div className="w-1/2">
+                <Arrow />
+                <div className="mt-2">
+                  <Link
+                    className="p-2 py-4 !bg-blue-700 hover:!text-white text-center hover:!bg-blue-600 !text-xs sm:!text-base !block rounded-lg !bg-blue-400 font-medium text-gray-100"
+                    to="/appointments"
+                  >
+                    <AiOutlineSchedule className="mb-2 flex justify-center items-center w-full !text-lg sm:!text-2xl" />
+                    Your Appointments
+                  </Link>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
         <div className="flex gap-8 mt-2 justify-center px-2">
@@ -132,7 +169,7 @@ const HomePage = ({ socket, user }) => {
             <div className="mt-2">
               <Link
                 className="p-2 py-4 !bg-blue-600 hover:!text-white text-center hover:!bg-blue-700 !text-xs sm:!text-base !block rounded-lg !bg-blue-400 font-medium text-gray-100"
-                to="/doctor"
+                to="/doctors"
               >
                 <GiDoctorFace className="mb-2 flex justify-center items-center w-full !text-lg sm:!text-2xl" />
                 Doctors
@@ -169,73 +206,82 @@ const HomePage = ({ socket, user }) => {
       <PostsContextProvider>
         <Posts socket={socket} home={true} isMobile={isMobile} />
       </PostsContextProvider>
-      <Title className="!text-lg sm:!text-3xl home--header">
-        Online Clinic Statistics
-      </Title>
-      <Row
-        className="text-center shadow-md"
-        style={{ marginBottom: "15px", marginLeft: "10px" }}
-      >
-        {HomeData?.map(
-          ({ title, value, prefix, suffix, isLine, noLine, borderLine }, i) => {
-            const homeDetails = (
-              <>
-                <hr
-                  className={`${
-                    isLine
-                      ? `w-full ${
-                          noLine == "no" ? "" : `no--line ${noLine}:w-0`
-                        }`
-                      : ""
-                  } ${
-                    borderLine == "2"
-                      ? "border-gray-600"
-                      : "border-1 border-gray-300"
-                  } mb-2`}
-                  style={{
-                    borderWidth: borderLine == "2" ? "1.5px" : "",
-                  }}
-                />
-                <Col
-                  className={`w-full sm:w-1/2 home--col--${
-                    i + 1
-                  } hover:shadow-md hover:bg-blue-100`}
-                >
-                  {" "}
-                  <Statistic
-                    title={
-                      <span className="text-gray-500 font-medium text-sm sm:text-lg">
-                        {title}
-                      </span>
-                    }
-                    className="statistics--name"
-                    precision={2}
-                    valueStyle={{
-                      fontSize: isMobile ? "15px" : "20px",
-                      fontWeight: 500,
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                    value={value}
-                    formatter={
-                      title == "Average Rating"
-                        ? null
-                        : (val) => <Countup end={val} />
-                    }
-                    suffix={suffix}
-                    prefix={prefix}
-                  />{" "}
-                </Col>
-              </>
-            );
-            const HomeDetails = React.cloneElement(homeDetails, {
-              key: title,
-            });
-            return HomeDetails;
-          }
-        )}
-      </Row>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <Title className="!text-lg sm:!text-3xl home--header">
+            Online Clinic Statistics
+          </Title>
+          <Row
+            className="text-center shadow-md"
+            style={{ marginBottom: "15px", marginLeft: "10px" }}
+          >
+            {HomeData?.map(
+              (
+                { title, value, prefix, suffix, isLine, noLine, borderLine },
+                i
+              ) => {
+                const homeDetails = (
+                  <>
+                    <hr
+                      className={`${
+                        isLine
+                          ? `w-full ${
+                              noLine == "no" ? "" : `no--line ${noLine}:w-0`
+                            }`
+                          : ""
+                      } ${
+                        borderLine == "2"
+                          ? "border-gray-600"
+                          : "border-1 border-gray-300"
+                      } mb-2`}
+                      style={{
+                        borderWidth: borderLine == "2" ? "1.5px" : "",
+                      }}
+                    />
+                    <Col
+                      className={`w-full sm:w-1/2 home--col--${
+                        i + 1
+                      } hover:shadow-md hover:bg-blue-100`}
+                    >
+                      {" "}
+                      <Statistic
+                        title={
+                          <span className="text-gray-500 font-medium text-sm sm:text-lg">
+                            {title}
+                          </span>
+                        }
+                        className="statistics--name"
+                        precision={2}
+                        valueStyle={{
+                          fontSize: isMobile ? "15px" : "20px",
+                          fontWeight: 500,
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                        value={value}
+                        formatter={
+                          title == "Average Rating"
+                            ? null
+                            : (val) => <Countup end={val} />
+                        }
+                        suffix={suffix}
+                        prefix={prefix}
+                      />{" "}
+                    </Col>
+                  </>
+                );
+                const HomeDetails = React.cloneElement(homeDetails, {
+                  key: title,
+                });
+                return HomeDetails;
+              }
+            )}
+          </Row>
+        </>
+      )}
       <div className="showmore--container">
         <div className="doctor--search py-3 rounded-tr-lg rounded-tl-lg bg-gray-700/80">
           <h1

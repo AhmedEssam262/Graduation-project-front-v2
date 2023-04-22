@@ -1,4 +1,4 @@
-import { Button, Drawer, Empty, message, Popover } from "antd";
+import { Button, Drawer, Empty, message, Popover, Tag } from "antd";
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { useSlotsContext } from "../../../contexts/SlotsContextProvider";
@@ -10,6 +10,11 @@ import AppointmentForm from "./scheduleUtils/AppointmentForm";
 import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import AppointmentCard from "./scheduleUtils/AppointmentCard";
 import { useNavigate } from "react-router-dom";
+import {
+  CloseCircleOutlined,
+  Loading3QuartersOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 const isMatch = (arr1, arr2) => {
   if (arr1?.length == 0 && arr2?.length == 0) return true;
   if (arr1?.length !== arr2?.length) return false;
@@ -20,13 +25,13 @@ const isMatch = (arr1, arr2) => {
 const ScheduleAppointments = ({
   doctorData,
   userid,
+  isDoctorLoading,
   buttonLabel,
   fetchUserData,
   offsetWidth,
   setDashType,
   socket,
 }) => {
-  const time = useState({});
   const [handleDrawer, setHandleDrawer] = useState(false);
   const { slotsData, isLoading, fetchSlotsData } = useSlotsContext();
   const [messageApi, contextHolder] = message.useMessage();
@@ -35,6 +40,9 @@ const ScheduleAppointments = ({
   const [isAction, setIsAction] = useState(false);
   const [selectedDate, setSelectedDate] = useState(() => dayjs());
   const navigate = useNavigate();
+  const isVerified =true;
+//  const isVerified = doctorData?.is_verified;
+
   useEffect(() => {
     if (userid) socket.emit("join_appointments", userid);
   }, []);
@@ -49,12 +57,17 @@ const ScheduleAppointments = ({
           true
         );
     };
-    if (userid && selectedDate.format("YYYY-MM-DD")) {
+    if (
+      userid &&
+      selectedDate.format("YYYY-MM-DD") &&
+      !(!isDoctorLoading && !isVerified)
+    ) {
       socket.on("update_slots", getSlots);
       fetchSlotsData({
         date: selectedDate.format("YYYY-MM-DD"),
         doctorId: userid,
       });
+      console.log("rendner", selectedDate.format("YYYY-MM-DD"));
     }
     return () => {
       socket?.off("all_slots", getSlots);
@@ -85,7 +98,7 @@ const ScheduleAppointments = ({
           My Appointments
         </span>
       </div>
-      <h1 className="text-center !mb-3 text-gray-700 text-lg sm:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl mt-2">
+      <h1 className="text-center !my-6 text-gray-700 text-xl sm:text-2xl xl:text-3xl 2xl:text-4xl mt-2">
         Schedule Your Appointments
       </h1>
       {contextHolder}
@@ -96,7 +109,7 @@ const ScheduleAppointments = ({
         handleDate={handleDate}
       />
       {/* =================================== for book appointment page ===================================== */}
-      {isUpToDate && !isLoading ? (
+      {isUpToDate && !isLoading && !isDoctorLoading && isVerified ? (
         <>
           <div className="flex gap-2 flex-wrap">
             {tAppointments?.map(
@@ -180,8 +193,32 @@ const ScheduleAppointments = ({
             />
           </Drawer>
         </>
-      ) : isLoading ? (
+      ) : isLoading || isDoctorLoading ? (
         <Loader />
+      ) : isVerified == null ? (
+        <div className="flex p-2 bg-yellow-600/60 rounded-lg flex-wrap gap-2 items-center justify-center">
+          <div className="text-2xl text-yellow-100 font-medium">
+            Your Account being Verified
+          </div>
+          <Tag
+            color="gold"
+            className="!flex gap-2 !items-center !p-4 !text-4xl !font-medium"
+          >
+            pending <LoadingOutlined />
+          </Tag>
+        </div>
+      ) : isVerified == 0 ? (
+        <div className="flex p-2 bg-red-600/60 rounded-lg flex-wrap gap-2 items-center justify-center">
+          <div className="text-2xl text-red-100 font-medium">
+            Your Account has been Rejected
+          </div>
+          <Tag
+            color="red"
+            className="!flex gap-2 !items-center !p-4 !text-4xl !font-medium"
+          >
+            Rejected <CloseCircleOutlined />
+          </Tag>
+        </div>
       ) : (
         <Empty
           className="!mt-2"

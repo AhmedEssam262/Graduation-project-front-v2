@@ -45,13 +45,13 @@ const cancelAppointment = (
         content: "Your Appointment Canceled",
         duration: 3,
       });
-      socket.emit("update_appointments", {
+      socket?.emit("update_appointments", {
         date: selectedDate?.format("YYYY-MM-DD"),
         doctorId,
       });
       setBookedSlot(null);
-      if (cancelFrom == "doctor") setShowPop(null);
-      if (cancelFrom == "doctor")
+      if (cancelFrom == "doctor" || cancelFrom == "admin") setShowPop(null);
+      if (cancelFrom == "doctor" || cancelFrom == "admin")
         fetchData({
           date: selectedDate?.format("YYYY-MM-DD"),
           doctorId,
@@ -71,7 +71,6 @@ const cancelAppointment = (
           content: "there's some issues, please try again later",
           duration: 3,
         });
-        setBookedSlot(null);
       }
     });
 };

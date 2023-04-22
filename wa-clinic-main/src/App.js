@@ -31,7 +31,9 @@ import Posts from "./components/posts/Posts";
 import io from "socket.io-client";
 import AppointmentPayment from "./components/bookAppointment/appointmentUtils/AppointmentPayment";
 import ServerError from "./components/utils/ServerError";
-const socket = io.connect(`http://${window.location.hostname}:3000`);
+import AdminDashboard from "./components/admin/AdminDashboard";
+import { ContextProvider } from "./components/admin/contexts/ContextProvider";
+const socket = io.connect(`http://${window.location.hostname}:5000`);
 const cookies = new Cookies();
 const handleRoute = (element, permission, isLoading, isError) =>
   permission ? (
@@ -96,7 +98,7 @@ const App = () => {
             />
             <Route
               path="/chat"
-              element={
+              element={handleRoute(
                 <ChatContextProvider fetchUserData={fetchUserData}>
                   <Chat
                     isChat={true}
@@ -105,8 +107,11 @@ const App = () => {
                     messageApi={messageApi}
                     socket={socket}
                   />
-                </ChatContextProvider>
-              }
+                </ChatContextProvider>,
+                userAuth,
+                isLoading,
+                isError
+              )}
             />
             <Route
               path="/profile/:username"
@@ -164,10 +169,18 @@ const App = () => {
                     fetchUserData={fetchUserData}
                     user={userAuth}
                     socket={socket}
-                    isError={isError}
                   />
                 </AppointmentContextProvider>,
-                userAuth,
+                userAuth && userAuth?.user_type !== "admin",
+                isLoading,
+                isError
+              )}
+            />
+            <Route
+              path="/admin"
+              element={handleRoute(
+                <AdminDashboard socket={socket} user={userAuth} />,
+                userAuth?.user_type == "admin",
                 isLoading,
                 isError
               )}
@@ -182,7 +195,6 @@ const App = () => {
                   <DoctorDashboard
                     setNavActive={setNavActive}
                     messageApi={messageApi}
-                    isError={isError}
                     isUserLoading={isLoading}
                     user={userAuth}
                     fetchUserData={fetchUserData}
@@ -197,10 +209,7 @@ const App = () => {
           </Routes>
         </div>
       </div>
-      {!(
-        location.pathname?.includes("/dashboard") ||
-        location.pathname?.includes("/chat")
-      ) && (
+      {location.pathname == "/" && (
         <div className="app--footer">
           <Footer />
         </div>

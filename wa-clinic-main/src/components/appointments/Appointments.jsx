@@ -43,7 +43,6 @@ const getAppointmentVal = (
     : valDefault;
 const Appointments = ({
   user,
-  isError,
   fetchUserData,
   fromDash,
   messageApi,
@@ -86,7 +85,7 @@ const Appointments = ({
       <div
         className={`mt-4 flex flex-wrap ${
           fromDash ? "lg" : "sm"
-        }:flex-nowrap gap-1 justify-evenly cursor-pointer text-white text-center text-sm xl:text-lg`}
+        }:flex-nowrap gap-1 justify-evenly px-2 cursor-pointer text-white text-center text-sm xl:text-lg`}
       >
         <div
           className={`flex  items-center hover:shadow-xl ${
@@ -353,11 +352,6 @@ const Appointments = ({
             }
           />
         )
-      ) : isError ? (
-        <Alert
-          className="mt-10"
-          description="there's some issues rigth now !!!"
-        />
       ) : (
         <Empty
           className="p-2 !m-0 !mx-2 bg-gray-500 rounded-lg border-1 

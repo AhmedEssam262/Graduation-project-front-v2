@@ -284,13 +284,35 @@ const AppointmentForm = ({
   socket,
 }) => {
   const [appointmentDetails, setAppointmentDetails] = useState([]);
+  const [isDone, setIsDone] = useState(false);
   const [appointmentElements, setAppointmentElements] = useState([
     <AppointmentDetails />,
   ]);
   const isFilled = chkFillingData(appointmentDetails);
-  const isAdjusted = chkTimeSlot([...appointmentDetails, ...tAppointments]);
+  const isAdjusted = chkTimeSlot([
+    ...appointmentDetails,
+    ...(isEdit
+      ? tAppointments?.filter(
+          ({ appointmentId }) =>
+            appointmentId !== editAppointment?.appointmentId
+        )
+      : tAppointments),
+  ]);
   const isUpToDate = chkUpToDate(appointmentDetails, selectedDate);
-  const isDone = isFilled && isAdjusted && isUpToDate;
+  const isNotMatched = isEdit
+    ? appointmentDetails.some(
+        ({ slotTime, appointmentDuration, appointmentFees, appointmentType }) =>
+          !(
+            editAppointment?.appointmentFees == appointmentFees &&
+            editAppointment?.appointmentType == appointmentType &&
+            editAppointment?.appointmentDuration == appointmentDuration &&
+            editAppointment?.slotTime == slotTime
+          )
+      )
+    : true;
+  useEffect(() => {
+    setIsDone(() => isFilled && isAdjusted && isUpToDate && isNotMatched);
+  }, [isFilled, isAdjusted, isUpToDate, isNotMatched]);
   return (
     <div className="p-2 sm:p-4">
       {/* <input
@@ -351,7 +373,7 @@ const AppointmentForm = ({
           showArrow={false}
           color="cyan"
           placement="bottomLeft"
-          trigger="click"
+          trigger={isDone ? "no" : "click"}
           open={!isDone ? null : false}
           content={
             !chkFillingData(appointmentDetails) ? (
@@ -365,6 +387,10 @@ const AppointmentForm = ({
             ) : !isAdjusted ? (
               <span className="text-white font-medium">
                 try to fix timing spaces between new appointments times
+              </span>
+            ) : !isNotMatched ? (
+              <span className="text-white font-medium">
+                do any changes to edit
               </span>
             ) : (
               <span className="text-white font-medium">
@@ -384,7 +410,7 @@ const AppointmentForm = ({
                   fetchSlotsData,
                   userid,
                   fetchUserData,
-                  isDone,
+                  setIsDone,
                   null,
                   isEdit,
                   [editAppointment?.appointmentId],

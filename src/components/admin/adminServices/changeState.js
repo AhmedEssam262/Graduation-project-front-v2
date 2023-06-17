@@ -22,7 +22,7 @@ const changeState = async (
   setIsLoading(true);
   axios
     .post(
-      `http://${host}:5000/change/doctor`,
+      `http://127.0.0.1:8000/api/change/doctor`,
       {
         data: {
           type,

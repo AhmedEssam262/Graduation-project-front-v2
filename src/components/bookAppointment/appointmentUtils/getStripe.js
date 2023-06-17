@@ -3,7 +3,7 @@ let stripePromise;
 const getStripe = () => {
   if (!stripePromise) {
     stripePromise = loadStripe(
-      "pk_test_51Mv8i0KIIZgjDvpwQVYPZQfRS86MJlkT51L4WqPVBgghi90BYk3sm9Py77U92keOdhb37L1JX4aaHvRVSHFfOZfV00JpyJDugk"
+      "pk_test_51M9qWBLkzeNmV6Wx5JxH5L1nVm5mfpSGoDFTwQ3kYCgq6g27TeJUvnpabzWTsREcafbUJoYYXOF4LODNKIKTbNS700GeW2fOTz"
     );
   }
   return stripePromise;

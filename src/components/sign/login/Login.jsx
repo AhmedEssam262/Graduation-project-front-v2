@@ -26,7 +26,6 @@ const signing = (
 ) => {
   messageApi.open(getMessage(1, "loading", "verfying...", 8));
   const host = window?.location?.hostname;
-  console.log(values);
   delete values?.remember;
   axios
     .post(
@@ -38,12 +37,26 @@ const signing = (
         headers: {
           "Content-Type": "application/json",
         },
-        //withCredentials: true,
+       // withCredentials: true,
       }
     )
-    .then(({ data }) => {
+    .then(async ({ data }) => {
       const cookies = new Cookies();
       if (data?.data?.token) cookies.set("accessToken", data?.data?.token);
+      // const handleExpired = async () => {
+      //   try {
+      //     const record = jwtDecode(new Cookies().get("accessToken"));
+      //     //fetchUserData(true)
+      //     console.log(Math.abs(+(record?.exp + "000") - Date.now()), "rec");
+      //     timeId = setTimeout(() => {
+      //       console.log("render");
+      //       fetchUserData(true, new Cookies().get("accessToken"), null, true);
+      //     }, Math.abs(+(record?.exp + "000") - Date.now()));
+      //   } catch (err) {
+      //     console.log(err, "err");
+      //   }
+      // };
+      // handleExpired();
       messageApi.open(getMessage(1, "success", "login successfully", 2));
       setTimeout(() => {
         const loc = new URLSearchParams(location?.search)?.get("redirect");
@@ -52,6 +65,7 @@ const signing = (
       }, 2000);
     })
     .catch((err) => {
+      console.log(err);
       const { isExist, isVerified } = err?.response?.data?.data || {};
       if (isExist == 0) {
         // bad request, name not exist
@@ -83,7 +97,7 @@ const Login = ({ isTokenExpired, fetchUserData, user }) => {
   });
   useEffect(() => {
     if (user?.user_id) return navigate("/");
-  }, []);
+  }, [user]);
   const [formValues, setFormValues] = useState(null);
   return (
     <div
@@ -170,9 +184,9 @@ const Login = ({ isTokenExpired, fetchUserData, user }) => {
                 message: "Please input your password!",
               },
               {
-                message: `Minimum eight and maximum 12 characters, at least 
+                message: `Minimum 8 and maximum 14 characters, at least 
               one uppercase letter, one lowercase letter  `,
-                pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,12}$",
+                pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,14}$",
               },
             ]}
           >

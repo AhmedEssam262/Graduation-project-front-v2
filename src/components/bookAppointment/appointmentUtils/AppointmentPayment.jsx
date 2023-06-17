@@ -13,7 +13,7 @@ import Loader from "../../Loader";
 // Don’t submit any personally identifiable information in requests made with this key.
 // Sign in to see your own test API key embedded in code samples.
 const stripePromise = loadStripe(
-  "pk_test_51Mv8i0KIIZgjDvpwQVYPZQfRS86MJlkT51L4WqPVBgghi90BYk3sm9Py77U92keOdhb37L1JX4aaHvRVSHFfOZfV00JpyJDugk"
+  "pk_test_51M9qWBLkzeNmV6Wx5JxH5L1nVm5mfpSGoDFTwQ3kYCgq6g27TeJUvnpabzWTsREcafbUJoYYXOF4LODNKIKTbNS700GeW2fOTz"
 );
 const AppointmentPayment = ({
   bookedAppointment,
@@ -37,9 +37,13 @@ const AppointmentPayment = ({
           Authorization: `Bearer ${new Cookies()?.get("accessToken")}`,
         },
         data: JSON.stringify({
-          doctorId,
-          selectedDate,
-          ...bookedAppointment,
+            data:
+            {
+              doctorId,
+              selectedDate,
+              ...bookedAppointment,
+            }
+          
         }),
       })
       .then(({ data }) => {

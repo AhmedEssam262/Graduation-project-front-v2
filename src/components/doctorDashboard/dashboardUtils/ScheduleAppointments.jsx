@@ -41,7 +41,7 @@ const ScheduleAppointments = ({
   const [selectedDate, setSelectedDate] = useState(() => dayjs());
   const navigate = useNavigate();
   const isVerified =true;
-//  const isVerified = doctorData?.is_verified;
+  //const isVerified = doctorData?.is_verified;
 
   useEffect(() => {
     if (userid) socket.emit("join_appointments", userid);

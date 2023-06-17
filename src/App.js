@@ -33,7 +33,7 @@ import AppointmentPayment from "./components/bookAppointment/appointmentUtils/Ap
 import ServerError from "./components/utils/ServerError";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import { ContextProvider } from "./components/admin/contexts/ContextProvider";
-const socket = io.connect(`http://${window.location.hostname}:5000`);
+const socket = io.connect(`http://${window.location.hostname}:8000`);
 const cookies = new Cookies();
 const handleRoute = (element, permission, isLoading, isError) =>
   permission ? (

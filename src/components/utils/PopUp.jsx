@@ -11,8 +11,11 @@ const PopUp = ({
 }) => {
   const [showPop, setShowPop] = useState(false);
   useEffect(() => {
-    if (!show) setTimeout(() => setShowPop(show), 500);
-    else setShowPop(show);
+    let timeId;
+    if (!show) {
+      timeId = setTimeout(() => setShowPop(show), 500);
+    } else setShowPop(show);
+    return () => clearTimeout(timeId);
   }, [show]);
   return (
     <>
@@ -21,7 +24,7 @@ const PopUp = ({
           style={{
             backdropFilter: "blur(20px)",
           }}
-          className={`mask--booked transition-all duration-500 fixed flex z-20 items-start justify-center top-0 left-0 h-full w-full`}
+          className={`mask--booked transition-all duration-500 fixed flex z-40 items-start justify-center top-0 left-0 h-full w-full`}
         >
           <div
             style={{

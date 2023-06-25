@@ -6,11 +6,18 @@ import {
 import React from "react";
 import { BiMessageAltDetail } from "react-icons/bi";
 import { FaClinicMedical } from "react-icons/fa";
+const adjustTime = (date, time, timeZone) =>
+  new Date(`${date} ${time} ${timeZone}`).toLocaleTimeString("en", {
+    hour: "numeric",
+    minute: "numeric",
+  });
 const BookButton = ({
   appointmentType,
   appointmentFees,
   appointmentState,
   slotTime,
+  schedule_date,
+  timeZone,
   setBookedSlot,
   isActive,
 }) => {
@@ -41,7 +48,9 @@ const BookButton = ({
       </div>
       <hr className="w-full my-2" />
       <div className="w-full text-center">
-        <span className="text-white font-medium">{slotTime}</span>
+        <span className="text-white font-medium">
+          {adjustTime(schedule_date, slotTime, timeZone)}
+        </span>
       </div>
     </div>
   );

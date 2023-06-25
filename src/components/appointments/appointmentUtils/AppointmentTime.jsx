@@ -4,6 +4,11 @@ import React, { useState, useEffect } from "react";
 import Cookies from "universal-cookie";
 import CountdownTimer from "./CountdownTimer";
 let k;
+const adjustTime = (date, time, timeZone) =>
+  new Date(`${date} ${time} ${timeZone}`).toLocaleTimeString("en", {
+    hour: "numeric",
+    minute: "numeric",
+  });
 const AppointmentTime = ({
   appointmentId,
   appointment_state,
@@ -15,9 +20,14 @@ const AppointmentTime = ({
   fetchAppointmentData,
   order,
   date,
+  appointment_duration,
+  timeZone,
+  socket,
 }) => {
   useEffect(() => {
-    const timeStamp = new Date(schedule_date + " " + slot_time) - new Date();
+    const timeStamp =
+      new Date(schedule_date + " " + slot_time + timeZone).getTime() -
+      new Date().getTime();
     if (appointment_state == "booked" && !isNaN(timeStamp)) {
       const timeId = setTimeout(() => {
         fetchAppointmentData(
@@ -25,18 +35,58 @@ const AppointmentTime = ({
           new Cookies().get("accessToken"),
           true,
           {
-            schedule_date,
-            slot_time,
+            // p_state: appointment_state,
+            // appointment_state:
+            //   new Date(schedule_date + " " + slot_time + timeZone).getTime() +
+            //     appointment_duration >=
+            //   new Date().getTime()
+            //     ? "running"
+            //     : "done",
             doctorId,
             patientId,
             appointmentId,
           },
           {
             date,
-          }
+          },
+          true
         );
       }, [timeStamp < 0 ? 0 : timeStamp]);
       return () => clearTimeout(timeId);
+    } else if (appointment_state == "running") {
+      const time_stamp = timeStamp + appointment_duration;
+      if (!isNaN(timeStamp)) {
+        socket?.emit("update_appointments", {
+          date: schedule_date,
+          doctorId,
+          appointmentId,
+        });
+        const timeId = setTimeout(() => {
+          if (
+            new Date(schedule_date + " " + slot_time + timeZone).getTime() +
+              appointment_duration <=
+            new Date().getTime()
+          ) {
+            fetchAppointmentData(
+              true,
+              new Cookies().get("accessToken"),
+              true,
+              {
+                // p_state: appointment_state,
+                // appointment_state: "done",
+                doctorId,
+                patientId,
+                appointmentId,
+              },
+              {
+                date,
+              },
+              true
+            );
+          }
+          return () => clearTimeout(timeId);
+        }, [time_stamp < 0 ? 0 : time_stamp]);
+      }
     }
   }, [schedule_date, slot_time, appointment_state]);
   return (
@@ -69,13 +119,13 @@ const AppointmentTime = ({
                   <td className="border-r border-gray-300 p-1">
                     {schedule_date}
                   </td>
-                  <td>{slot_time}</td>
+                  <td>{adjustTime(schedule_date, slot_time, timeZone)}</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-        {appointment_state == "booked" && (
+        {(appointment_state == "booked" || appointment_state == "running") && (
           <div className="text-white bg-gray-300/50 rounded-lg p-1 font-medium text-center">
             <span className="text-gray-700 font-medium text-base lg:text-lg 2xl:text-xl">
               Remaining Time
@@ -83,7 +133,15 @@ const AppointmentTime = ({
             <hr className="border-gray-700" />
             <CountdownTimer
               order={order}
-              targetDate={new Date(schedule_date + " " + slot_time)}
+              targetDate={
+                appointment_state == "booked"
+                  ? new Date(schedule_date + " " + slot_time + timeZone)
+                  : new Date(
+                      new Date(
+                        schedule_date + " " + slot_time + timeZone
+                      ).getTime() + appointment_duration
+                    )
+              }
             />
           </div>
         )}

@@ -292,6 +292,9 @@ ul[id*="sub31"]::-webkit-scrollbar-thumb,
   background-color: #373149aa;
   border: solid 1px rgb(219, 231, 239);
 }
+.scroll--h--chat--white::-webkit-scrollbar-thumb {
+  background-color: #ececedd6;
+}
 .scroll--v--chat::-webkit-scrollbar {
   width: 4.5px;
 }

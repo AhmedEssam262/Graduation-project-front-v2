@@ -100,7 +100,9 @@ function Signup({ user }) {
     query: "(max-width:778px)",
   });
   const [validState, setValidState] = useState("");
-  const [formValues, setFormValues] = useState(null);
+  const [formValues, setFormValues] = useState({
+    prefix: "20",
+  });
   const [imageUrls, setImageUrls] = useState([]);
   const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
@@ -367,58 +369,39 @@ function Signup({ user }) {
             font="medium"
             classLine={"w-1/2 border-1 mb-2"}
           />
-          <Item>
-            <Input.Group compact>
-              <div className="address--header w-1/2 sm:w-1/3">
-                <Item
-                  name={["address", "province"]}
-                  noStyle
-                  rules={[
-                    {
-                      required: true,
-                      message: "Province is required",
-                    },
-                  ]}
-                >
-                  <Select placeholder="Select province"> {cityOption}</Select>
-                </Item>
-              </div>
-              <div className="address--header w-1/2 sm:w-1/3">
-                <Item
-                  name={["address", "city"]}
-                  noStyle
-                  rules={[
-                    {
-                      required: true,
-                      message: "city is required",
-                    },
-                  ]}
-                >
-                  <Select
-                    placeholder="Select city"
-                    style={{
-                      minWidth: "calc(100% / 4)",
-                    }}
+          <Item className="!w-full">
+            <Input.Group className="!w-full">
+              <div className="flex flex-wrap sm:flex-nowrap items-center">
+                <div className="address--header w-full sm:w-2/5">
+                  <Item
+                    name={["address", "city"]}
+                    noStyle
+                    rules={[
+                      {
+                        required: true,
+                        message: "city is required",
+                      },
+                    ]}
                   >
-                    <Option value="elsk">elsheikh</Option>
-                    <Option value="oct">6-october</Option>
-                  </Select>
+                    <Select placeholder="Select city" showSearch>
+                      {cityOption}
+                    </Select>
+                  </Item>
+                </div>
+                <Item
+                  name={["address", "street"]}
+                  noStyle
+                  rules={[
+                    {
+                      required: true,
+                      message: "Street is required",
+                    },
+                  ]}
+                  className="!grow"
+                >
+                  <Input placeholder="Your street" />
                 </Item>
               </div>
-              <Item
-                name={["address", "street"]}
-                noStyle
-                rules={[
-                  {
-                    required: true,
-                    message: "Street is required",
-                  },
-                ]}
-              >
-                <div className="inline-block">
-                  <Input placeholder="Your street" />
-                </div>
-              </Item>
             </Input.Group>
           </Item>
         </div>

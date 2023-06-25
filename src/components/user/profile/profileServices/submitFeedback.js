@@ -6,7 +6,7 @@ const submitFeedback = async (
   feedbackValue,
   feedback_to,
   messageApi,
-  fetchProfileData,
+  setFetchFeedback,
   fetchUserData,
   doctorName
 ) => {
@@ -50,7 +50,7 @@ const submitFeedback = async (
           type: "success",
           duration: 2,
         });
-      fetchProfileData({ path: "profile", username: doctorName }, true);
+      setFetchFeedback((val) => !val);
     })
     .catch((err) => {
       console.log(err);

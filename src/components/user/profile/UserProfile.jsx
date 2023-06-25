@@ -40,6 +40,10 @@ import PatientRecords from "./profileUtils/PatientRecords";
 import PersonalForm from "./profileUtils/PersonalForm";
 import dayjs from "dayjs";
 import ServerError from "../../utils/ServerError";
+import ClinicForm from "./profileUtils/ClinicForm";
+import ClinicRegister from "./profileUtils/ClinicRegister";
+import ClinicDetails from "./profileUtils/ClinicDetails";
+import AccountVerify from "../../doctorDashboard/dashboardUtils/scheduleUtils/AccountVerify";
 const editingObject = (value, setValue, name, normal) => ({
   onChange: (newValue) => setValue((val) => ({ ...val, [name]: newValue })),
   icon: (normal && null) || <BiEdit color="white" className="text-white" />,
@@ -52,10 +56,17 @@ const editingObject = (value, setValue, name, normal) => ({
   // }
 });
 
-const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
+const UserProfile = ({
+  userid,
+  fetchUserData,
+  isUserLoading,
+  socket,
+  timeZone,
+}) => {
   const { username } = useParams();
   const [rateValue, setRateValue] = useState(0);
   const [showEdit, setShowEdit] = useState(false);
+  const [fetchFeedback, setFetchFeedback] = useState();
   const [messageApi, contextHolder] = message.useMessage();
   const { isLoading, profileData, fetchProfileData, isError } =
     useProfileContext();
@@ -76,7 +87,6 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
     bdate: null,
     pnumber: null,
     email: null,
-    province: null,
     city: null,
     street: null,
     images: [],
@@ -98,7 +108,6 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
           ? `${profileData?.["user"]?.prefix} ${profileData?.["user"]?.pnumber}`
           : profileData?.["user"]?.pnumber,
         email: profileData?.["user"]?.email || <StopOutlined />,
-        province: profileData?.["user"]?.province,
         city: profileData?.["user"]?.city,
         street: profileData?.["user"]?.street || <StopOutlined />,
         images: profileData?.["user"]?.img_urls || [],
@@ -116,6 +125,9 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
   const isUser = profileData?.["user"]?.user_type == "doctor" ? false : true; // check user profile
   const isAuth = userid && profileId == userid ? true : false; // user visit his profile
   const isProfile = profileData?.["user"];
+  const isVerified = true;
+
+  //const isVerified = profileData?.["doctor"]?.is_verified;
   const showDrawer = (type, name, className) => {
     setHandleDrawer(() => ({ isOpen: true, type, name, className }));
   };
@@ -152,9 +164,8 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
               <div className="text-center w-full sm:w-1/4">
                 <Image
                   src={
-                    userValues?.images?.[0]?.img_url || isUser
-                      ? userPhoto
-                      : doctorPhoto
+                    userValues?.images?.[0]?.img_url ||
+                    (isUser ? userPhoto : doctorPhoto)
                   }
                   width={130}
                   height={130}
@@ -316,7 +327,8 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
                   contentWrapperStyle={{
                     width:
                       handleDrawer.type == "medical" ||
-                      handleDrawer.type == "personal"
+                      handleDrawer.type == "personal" ||
+                      handleDrawer.type == "clinic"
                         ? "100%"
                         : "",
                   }}
@@ -346,7 +358,7 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
                             values?.feedback,
                             profileId,
                             messageApi,
-                            fetchProfileData,
+                            setFetchFeedback,
                             fetchUserData,
                             username
                           );
@@ -414,7 +426,6 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
                         gender: profileData?.["user"]?.gender,
                         birth: dayjs(profileData?.["user"]?.bdate),
                         address: {
-                          province: profileData?.["user"]?.province,
                           city: profileData?.["user"]?.city,
                           street: profileData?.["user"]?.street,
                         },
@@ -427,11 +438,45 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
                       userName={profileData?.["user"]?.user_id}
                       messageApi={messageApi}
                     />
+                  ) : handleDrawer.type == "clinic" ? (
+                    <ClinicForm
+                      initialValues={{
+                        name: "sd",
+                        address: {
+                          city: profileData?.["doctor"]?.clinic_city,
+                          street: profileData?.["doctor"]?.clinic_street,
+                        },
+                        phone: profileData?.["doctor"]?.clinic_pnumber,
+                        telephone: profileData?.["doctor"]?.clinic_tnumber,
+                        prefix: profileData?.["doctor"]?.clinic_prefix,
+                      }}
+                      fetchProfileData={fetchProfileData}
+                      fetchUserData={fetchUserData}
+                      userName={profileData?.["user"]?.user_id}
+                      messageApi={messageApi}
+                    />
                   ) : null}
                 </Drawer>
               </div>
             </div>
           </div>
+          {!isUser && isAuth ? (
+            <div className="mx-1 sm:mx-0">
+              <div className="mt-2 sm:w-4/5 lg:w-3/4 m-auto">
+                <AccountVerify isVerified={isVerified} />
+              </div>
+              {profileData?.["doctor"]?.clinic_city ? (
+                <ClinicDetails
+                  setHandleDrawer={setHandleDrawer}
+                  clinicValues={profileData["doctor"]}
+                  showEdit={showEdit}
+                  username={username}
+                />
+              ) : (
+                <ClinicRegister />
+              )}
+            </div>
+          ) : null}
           <div className="mt-2">
             {isUser && !isAdmin ? (
               <div>
@@ -459,18 +504,20 @@ const UserProfile = ({ userid, fetchUserData, isUserLoading, socket }) => {
                   userid={userid}
                   doctorId={profileId}
                   socket={socket}
+                  timeZone={timeZone || ""}
                 />
               </SlotsContextProvider>
             )}
           </div>
           <ProfileDetails
+            fetchFeedback={fetchFeedback}
             setHandleDrawer={setHandleDrawer}
             isAuth={isAuth}
             isUser={isUser}
             showEdit={showEdit}
             setUserValues={setUserValues}
             userValues={userValues}
-            username={username}
+            username={username || userid}
           />
         </>
       ) : (

@@ -8,13 +8,21 @@ const changeState = async (
   setIsLoading,
   type,
   doctorId,
-  socket
+  isUser
 ) => {
   messageApi.open({
     key: 1,
     content: `${
-      type == "verified" ? "Verifying" : "Rejecting"
-    } doctor account ...`,
+      type == "verify"
+        ? "Verifying"
+        : type == "delete"
+        ? "Deleting"
+        : type == "reject"
+        ? "Rejecting"
+        : type == "restrict"
+        ? "Restricting"
+        : ""
+    } ${isUser ? "user" : "doctor"} account ...`,
     type: "loading",
     duration: 8,
   });
@@ -22,11 +30,15 @@ const changeState = async (
   setIsLoading(true);
   axios
     .post(
-      `http://127.0.0.1:8000/api/change/doctor`,
+      `http://127.0.0.1:8000/api/change/${isUser ? "user" : "doctor"}`,
       {
         data: {
           type,
-          doctorId,
+          ...(type == "restrict"
+            ? doctorId
+            : isUser
+            ? { userId: doctorId }
+            : { doctorId }),
         },
       },
       {
@@ -39,8 +51,16 @@ const changeState = async (
     .then((res) => {
       messageApi.open({
         key: 1,
-        content: `doctor account ${
-          type == "verified" ? "is verified" : "is rejected"
+        content: `${isUser ? "user" : "doctor"} account ${
+          type == "verify"
+            ? "has been verified"
+            : type == "delete"
+            ? "has been deleted"
+            : type == "reject"
+            ? "has been rejected"
+            : type == "restrict"
+            ? "Restricted"
+            : ""
         }`,
         type: "success",
         duration: 4,
@@ -49,7 +69,9 @@ const changeState = async (
         {
           total: true,
         },
-        true
+        type == "restrict" ? new Cookies().get("accessToken") : true,
+        type == "restrict" ? { userid: doctorId?.chat_from } : null,
+        type == "restrict" ? true : null
       );
       setIsLoading(false);
     })

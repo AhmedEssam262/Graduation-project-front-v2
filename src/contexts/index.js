@@ -9,4 +9,5 @@ export { default as PostsContextProvider } from "./PostsContextProvider.jsx";
 export { default as CommentsContextProvider } from "./CommentsContextProvider.jsx";
 export { default as ChatContextProvider } from "./ChatContextProvider.jsx";
 export { default as AppointmentContextProvider } from "./AppointmentContextProvider.jsx";
+export { default as UsersContextProvider } from "./UsersContextProvider.jsx";
 export { default as MessagesContextProvider } from "./MessagesContextProvider.jsx";

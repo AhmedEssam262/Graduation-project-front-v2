@@ -17,6 +17,7 @@ const FeedbackContextProvider = ({
   contextQuery,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
   const [feedbackData, setFeedbackData] = useState(null);
   const host = window?.location?.hostname;
   const fetchFeedbackData = async (query, notWaiting) => {
@@ -28,10 +29,12 @@ const FeedbackContextProvider = ({
       );
       setFeedbackData(data?.data);
       setIsLoading(false);
+      setIsError(false);
       return data;
     } catch (err) {
       console.log(err);
       //setFeedbackData(null);
+      setIsError(true);
       setIsLoading(false);
     }
   };
@@ -40,7 +43,7 @@ const FeedbackContextProvider = ({
   }, []);
   return (
     <FeedbackData.Provider
-      value={{ isLoading, feedbackData, fetchFeedbackData }}
+      value={{ isLoading, feedbackData, fetchFeedbackData, isError }}
     >
       {children}
     </FeedbackData.Provider>

@@ -14,6 +14,7 @@ const AppointmentDetails = ({
   doctorId,
   messageApi,
   fetchUserData,
+  timeZone,
 }) => {
   const [selectedDate, setSelectedDate] = useState({
     count: 0,
@@ -23,10 +24,29 @@ const AppointmentDetails = ({
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [showPop, setShowPop] = useState();
   useEffect(() => {
-    fetchSlotsData({
-      doctorId,
-      date: selectedDate?.date,
-    });
+    socket.emit("join_appointments", doctorId);
+  }, []);
+  useEffect(() => {
+    const getSlots = (data) => {
+      if (selectedDate?.date == data?.date)
+        fetchSlotsData(
+          {
+            doctorId,
+            date: selectedDate?.date,
+          },
+          true
+        );
+    };
+    if (selectedDate?.date) {
+      socket.on("update_slots", getSlots);
+      fetchSlotsData({
+        doctorId,
+        date: selectedDate?.date,
+      });
+    }
+    return () => {
+      socket?.off("all_slots", getSlots);
+    };
   }, [selectedDate]);
   return (
     <>
@@ -35,7 +55,7 @@ const AppointmentDetails = ({
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
       />
-      <div className="mt-2 h-52 overflow-auto p-1">
+      <div className="mt-2 max-h-52 overflow-auto p-1">
         <div className="flex gap-2 justify-evenly flex-wrap">
           <PopUp
             show={showPop}
@@ -113,6 +133,7 @@ const AppointmentDetails = ({
                   //   }`}
                 >
                   <AppointmentCard
+                    timeZone={timeZone}
                     selectedDate={dayjs(selectedDate?.date)}
                     socket={socket}
                     tAppointments={slotsData?.totalSlots}

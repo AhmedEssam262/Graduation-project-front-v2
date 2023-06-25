@@ -20,10 +20,16 @@ const chkTimeSlot = (data) =>
               new Date(`1970 ${t2}`).getTime();
     })
   );
-const chkUpToDate = (data, date) =>
+const chkUpToDate = (data, date, timeZone) =>
   data?.every(
     ({ slotTime: t }, i1) =>
-      new Date(date?.format("YYYY-MM-DD") + " " + t) > new Date()
+      new Date(
+        date?.format("YYYY-MM-DD") + " " + t + (timeZone || "")
+      ).getTime() > new Date().getTime() &&
+      date?.$D ==
+        new Date(
+          date?.format("YYYY-MM-DD") + " " + t + (timeZone || "")
+        ).getDate()
   );
 const chkFillingData = (data) =>
   !data?.some(
@@ -46,6 +52,8 @@ const AppointmentDetails = ({
   setAppointDetails,
   editAppointment,
   isEdit,
+  schedule_date,
+  timeZone,
 }) => {
   // console.log(doctorData)
   const [appointmentDetails, setAppointmentDetails] = useState(
@@ -113,6 +121,17 @@ const AppointmentDetails = ({
       <div className="flex flex-wrap mb-2 justify-center">
         <CountdownTimer
           order={order}
+          directMode={new Date(
+            `${schedule_date} ${appointmentDetails?.slotTime?.h}:${appointmentDetails?.slotTime?.m}:${appointmentDetails?.slotTime?.timeMode} ${timeZone}`
+          )
+            .toLocaleString()
+            .slice(-2)}
+          directHour={
+            new Date(
+              `${schedule_date} ${appointmentDetails?.slotTime?.h}:${appointmentDetails?.slotTime?.m}:${appointmentDetails?.slotTime?.timeMode} ${timeZone}`
+            ).getHours() % 12 || 12
+          }
+          timeZone={timeZone}
           appointmentDetails={appointmentDetails}
           setAppointmentDetails={setAppointmentDetails}
         />
@@ -282,6 +301,7 @@ const AppointmentForm = ({
   isEdit,
   editAppointment,
   socket,
+  timeZone,
 }) => {
   const [appointmentDetails, setAppointmentDetails] = useState([]);
   const [isDone, setIsDone] = useState(false);
@@ -298,7 +318,7 @@ const AppointmentForm = ({
         )
       : tAppointments),
   ]);
-  const isUpToDate = chkUpToDate(appointmentDetails, selectedDate);
+  const isUpToDate = chkUpToDate(appointmentDetails, selectedDate, timeZone);
   const isNotMatched = isEdit
     ? appointmentDetails.some(
         ({ slotTime, appointmentDuration, appointmentFees, appointmentType }) =>
@@ -337,6 +357,8 @@ const AppointmentForm = ({
               appointmentElements,
               setAppointmentElements,
               setAppointDetails: setAppointmentDetails,
+              schedule_date: selectedDate?.format("YYYY-MM-YY"),
+              timeZone,
             })
           )}
         </div>

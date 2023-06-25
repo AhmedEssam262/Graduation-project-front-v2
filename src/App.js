@@ -33,8 +33,10 @@ import AppointmentPayment from "./components/bookAppointment/appointmentUtils/Ap
 import ServerError from "./components/utils/ServerError";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import { ContextProvider } from "./components/admin/contexts/ContextProvider";
-const socket = io.connect(`http://${window.location.hostname}:8000`);
+import Transition from "./components/utils/transition/Transition";
+const socket = io.connect(`http://${window.location.hostname}:3000`);
 const cookies = new Cookies();
+const timeZone = " gmt+0300";
 const handleRoute = (element, permission, isLoading, isError) =>
   permission ? (
     element
@@ -83,7 +85,11 @@ const App = () => {
               path="/"
               element={
                 <HomeContextProvider>
-                  <HomePage user={userAuth} socket={socket} />
+                  <HomePage
+                    user={userAuth}
+                    isUserLoading={isLoading}
+                    socket={socket}
+                  />
                 </HomeContextProvider>
               }
             />
@@ -92,7 +98,12 @@ const App = () => {
               path="/doctors"
               element={
                 <DoctorsContextProvider noFirstRender>
-                  <Doctors user={userAuth} ref={DoctorRef} />
+                  <Doctors
+                    socket={socket}
+                    user={userAuth}
+                    ref={DoctorRef}
+                    timeZone={timeZone}
+                  />
                 </DoctorsContextProvider>
               }
             />
@@ -102,6 +113,7 @@ const App = () => {
                 <ChatContextProvider fetchUserData={fetchUserData}>
                   <Chat
                     isChat={true}
+                    timeZone={timeZone}
                     user={userAuth}
                     fetchUserData={fetchUserData}
                     messageApi={messageApi}
@@ -122,6 +134,7 @@ const App = () => {
                     isUserLoading={isLoading}
                     fetchUserData={fetchUserData}
                     userid={userAuth?.user_id}
+                    timeZone={timeZone}
                   />
                 </ProfileContextProvider>
               }
@@ -166,6 +179,7 @@ const App = () => {
                 >
                   <Appointments
                     messageApi={messageApi}
+                    timeZone={timeZone}
                     fetchUserData={fetchUserData}
                     user={userAuth}
                     socket={socket}
@@ -179,7 +193,11 @@ const App = () => {
             <Route
               path="/admin"
               element={handleRoute(
-                <AdminDashboard socket={socket} user={userAuth} />,
+                <AdminDashboard
+                  socket={socket}
+                  user={userAuth}
+                  timeZone={timeZone}
+                />,
                 userAuth?.user_type == "admin",
                 isLoading,
                 isError
@@ -197,6 +215,7 @@ const App = () => {
                     messageApi={messageApi}
                     isUserLoading={isLoading}
                     user={userAuth}
+                    timeZone={timeZone}
                     fetchUserData={fetchUserData}
                     socket={socket}
                   />

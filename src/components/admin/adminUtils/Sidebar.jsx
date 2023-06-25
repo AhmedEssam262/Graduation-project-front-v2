@@ -7,10 +7,26 @@ import {
 } from "react-icons/md";
 import { DashboardOutlined, HomeOutlined } from "@ant-design/icons";
 import { GiDoctorFace } from "react-icons/gi";
+import { GrUserSettings } from "react-icons/gr";
+import { FiUserCheck } from "react-icons/fi";
+import { BsHouseDoorFill } from "react-icons/bs";
+import { FaUserLock } from "react-icons/fa";
 const links = [
   {
     title: "Dashboard",
     links: [
+      {
+        link: "profile",
+        key: "profile",
+        value: "My Profile",
+        icon: <FaUserLock />,
+      },
+      {
+        link: "users",
+        key: "user",
+        value: "Users Managment",
+        icon: <FiUserCheck />,
+      },
       {
         link: "doctors",
         key: "doctor",
@@ -67,14 +83,13 @@ const Sidebar = ({
       {activeMenu && (
         <>
           <div className="flex justify-between items-center">
-            <Link
-              to="/admin"
-              onClick={handleCloseSideBar}
-              className="items-center gap-3 ml-3 mt-4 flex text-xl font-extrabold tracking-tight dark:text-white text-slate-900"
+            <div
+              onClick={() => handleCloseSideBar("profile")}
+              className="transition-all duration-500 cursor-pointer hover:!text-blue-500 items-center gap-3 ml-3 mt-4 flex text-xl font-extrabold tracking-tight dark:text-white text-slate-900"
             >
               <DashboardOutlined />
               <span>Admin</span>
-            </Link>
+            </div>
             <button
               type="button"
               onClick={() => setActiveMenu(!activeMenu)}
@@ -99,7 +114,7 @@ const Sidebar = ({
                         }
                       >
                         {link.icon}
-                        <span className="capitalize ">{link.value}</span>
+                        <span className="capitalize">{link.value}</span>
                       </button>
                     ))
                   : item.links.map((link) => (

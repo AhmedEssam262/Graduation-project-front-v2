@@ -15,10 +15,10 @@ const Message = ({ isMobile, me, content, issued_time }) => {
              : "rounded-br-lg bg-white"
          } p-2`}
       >
-        <span className={`${me ? "block ml-auto" : ""}`}>{content}</span>
+        <span className={`${me ? "block" : ""}`}>{content}</span>
         <span
           className={`${
-            !me ? "text-gray-400  block ml-auto" : "text-gray-200"
+            !me ? "text-gray-400  block ml-auto" : "ml-auto text-gray-200"
           } text-xs`}
         >
           {issued_time}

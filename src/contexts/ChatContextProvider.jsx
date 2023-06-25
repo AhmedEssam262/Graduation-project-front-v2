@@ -21,6 +21,7 @@ const handleQuery = (obj) =>
 const ChatData = createContext(null);
 const ChatContextProvider = ({ children, token, fetchUserData }) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(true);
   const [chatData, setChatData] = useState(null);
   const host = window?.location?.hostname;
   const fetchChatData = async (active, directToken, query, noWaiting) => {
@@ -40,9 +41,11 @@ const ChatContextProvider = ({ children, token, fetchUserData }) => {
         }
       );
       setChatData(data?.data);
+      setIsError(false);
       setIsLoading(false);
     } catch (err) {
       const msg = err?.response?.data?.data?.name;
+      setIsError(true);
       switch (msg) {
         case "TokenExpiredError":
           fetchUserData(true, null, {
@@ -82,6 +85,7 @@ const ChatContextProvider = ({ children, token, fetchUserData }) => {
     <ChatData.Provider
       value={{
         isLoading,
+        isError,
         chatData,
         fetchChatData,
         setChatData,

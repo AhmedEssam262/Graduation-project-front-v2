@@ -28,7 +28,7 @@ const UserItem = ({ user, setUserData, messageApi }) => {
           setShowLogout(false);
         }}
         className="user--nav--wrapper text-center rounded-bl-lg
-          rounded-br-lg inline-flex  cursor-pointer
+          rounded-br-lg inline-flex cursor-pointer
       grow justify-between items-center"
       >
         <Link
@@ -39,10 +39,10 @@ const UserItem = ({ user, setUserData, messageApi }) => {
               ? `/admin`
               : `/dashboard`
           }
-          className="text-white grow inline-block
+          className="text-white grow !inline-block
           font-bold hover:text-white !z-10"
         >
-          <Button className="!w-full !bg-transparent !h-10 !text-white !p-1 !border-0 !font-bold hover:!text-white">
+          <Button className="!w-full !h-full !bg-transparent !text-white !p-1 !border-0 !font-bold hover:!text-white">
             {user?.nick_name || "Profile"}
           </Button>
         </Link>

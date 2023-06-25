@@ -7,11 +7,13 @@ import {
   ChatContextProvider,
   DoctorsContextProvider,
   ProfileContextProvider,
+  UsersContextProvider,
 } from "../../contexts";
 import Chat from "../chat/Chat";
 import { useUserContext } from "../../contexts/UserContextProvider";
 import UserProfile from "../user/profile/UserProfile";
-const AdminDashboard = ({ user, socket }) => {
+import UserManagment from "./adminUtils/UserManagment";
+const AdminDashboard = ({ timeZone, user, socket }) => {
   const isMobile = useMediaQuery({
     query: "(max-width:878px)",
   });
@@ -70,8 +72,14 @@ const AdminDashboard = ({ user, socket }) => {
           </div>
           {dashType == "doctor" ? (
             <DoctorsContextProvider query={{ total: true }}>
-              <DoctorManagment socket={socket} />
+              <DoctorManagment socket={socket} timeZone={timeZone} />
             </DoctorsContextProvider>
+          ) : dashType == "user" ? (
+            <UsersContextProvider>
+              <DoctorsContextProvider query={{ total: true }}>
+                <UserManagment socket={socket} />
+              </DoctorsContextProvider>
+            </UsersContextProvider>
           ) : dashType == "chat" ? (
             <ChatContextProvider fetchUserData={fetchUserData}>
               <Chat
@@ -80,6 +88,7 @@ const AdminDashboard = ({ user, socket }) => {
                 fetchUserData={fetchUserData}
                 messageApi={messageApi}
                 socket={socket}
+                timeZone={timeZone}
               />
             </ChatContextProvider>
           ) : dashType == "profile" ? (
@@ -88,6 +97,7 @@ const AdminDashboard = ({ user, socket }) => {
                 isUserLoading={isLoading}
                 socket={socket}
                 fetchUserData={fetchUserData}
+                timeZone={timeZone}
                 userid={user?.user_id}
               />
             </ProfileContextProvider>

@@ -21,6 +21,9 @@ import Cookies from "universal-cookie";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaClinicMedical } from "react-icons/fa";
 import { BiMessageAltDetail } from "react-icons/bi";
+import { HiStatusOnline } from "react-icons/hi";
+import DoctorDetails from "./appointmentUtils/DoctorDetails";
+import AppointmentStart from "./appointmentUtils/AppointmentStart";
 const chkEmpty = (appointmentState, appointmentData) =>
   appointmentState == "total"
     ? false
@@ -32,6 +35,8 @@ const getAppointmentVal = (
   valDone,
   valBooked,
   valCanceled,
+  valFree,
+  valRunning,
   valDefault
 ) =>
   appointment_state == "done"
@@ -40,12 +45,17 @@ const getAppointmentVal = (
     ? valBooked
     : appointment_state == "canceled"
     ? valCanceled
+    : appointment_state == "free"
+    ? valFree
+    : appointment_state == "running"
+    ? valRunning
     : valDefault;
 const Appointments = ({
   user,
   fetchUserData,
   fromDash,
   messageApi,
+  timeZone,
   socket,
 }) => {
   const [selectedDate, setSelectedDate] = useState(() => ({
@@ -53,6 +63,7 @@ const Appointments = ({
     date: dayjs().format("YYYY-MM-DD"),
   }));
   const [appointmentState, setAppointmentState] = useState("total");
+  const [showPop, setShowPop] = useState({ show: false, data: null });
   const [cancelAppoint, setCancelAppoint] = useState();
   const { appointmentData, isLoading, setDashType, fetchAppointmentData } =
     useAppointmentContext();
@@ -117,7 +128,7 @@ const Appointments = ({
         </div>
         <div
           className={`flex items-center hover:shadow-xl ${
-            appointmentState == "done"
+            appointmentState == "running"
               ? "bg-yellow-500"
               : "hover:bg-gray-600 bg-gray-800"
           } p-2`}
@@ -125,9 +136,9 @@ const Appointments = ({
             borderRadius: "20px 20px 0px 0px",
             border: "2px 2px 0px 2px solid white",
           }}
-          onClick={() => setAppointmentState("done")}
+          onClick={() => setAppointmentState("running")}
         >
-          Done Appointments
+          Running Appointment
         </div>
         {fromDash && (
           <div
@@ -176,6 +187,7 @@ const Appointments = ({
                   appointment_state,
                   appointment_id,
                   appointment_type,
+                  appointment_duration,
                   booked_time,
                   slot_time,
                   doctorName,
@@ -186,6 +198,10 @@ const Appointments = ({
                   schedule_date,
                   fees,
                   specialty,
+                  clinic_city,
+                  clinic_street,
+                  clinic_pnumber,
+                  clinic_tnumber,
                 },
                 i
               ) =>
@@ -199,7 +215,7 @@ const Appointments = ({
                     // }}
                   >
                     <div
-                      className={`flex flex-wrap items-start gap-1 p-2 bg-gray-300 rounded-lg border-1 border-white shadow-md`}
+                      className={`flex flex-wrap gap-1 p-2 bg-gray-300 rounded-lg border-1 border-white shadow-md`}
                     >
                       <div
                         style={{
@@ -211,7 +227,8 @@ const Appointments = ({
                         "bg-green-700/50",
                         "bg-yellow-600/50",
                         "bg-red-700/50",
-                        "bg-blue-700/50"
+                        "bg-blue-700/50",
+                        "bg-blue-800/50"
                       )}`}
                       >
                         <div className="grow">
@@ -222,7 +239,8 @@ const Appointments = ({
                                 <CheckCircleOutlined className="!flex items-center !text-yellow-200 !text-2xl" />,
                                 <ClockCircleOutlined className="!flex items-center !text-yellow-200 !text-2xl" />,
                                 <CloseCircleOutlined className="!flex items-center !text-yellow-200 !text-2xl" />,
-                                <AiOutlineLoading3Quarters className="!flex items-center !text-yellow-200 !text-2xl" />
+                                <AiOutlineLoading3Quarters className="!flex items-center !text-yellow-200 !text-2xl" />,
+                                <HiStatusOnline className="!flex items-center !text-2xl" />
                               )}
                               <span className="text-yellow-300 font-semibold">
                                 Status:
@@ -243,14 +261,23 @@ const Appointments = ({
                             </div>
                             {appointment_state == "booked" && !fromDash ? (
                               <div
-                                onClick={() =>
+                                onClick={() => {
                                   setCancelAppoint({
                                     selectedDate: dayjs(schedule_date),
                                     bookedSlot: slot_time,
                                     doctorId,
                                     appointmentId: appointment_id,
-                                  })
-                                }
+                                  });
+                                  setShowPop((val) => ({
+                                    show: true,
+                                    data: {
+                                      selectedDate: dayjs(schedule_date),
+                                      bookedSlot: slot_time,
+                                      doctorId,
+                                      appointmentId: appointment_id,
+                                    },
+                                  }));
+                                }}
                                 className="cursor-pointer hover:bg-red-400/80 bg-red-400/50 rounded shadow-lg p-2"
                               >
                                 <div className="flex gap-1 h-full justify-center items-center">
@@ -264,6 +291,7 @@ const Appointments = ({
                           </div>
                           <AppointmentTime
                             appointmentId={appointment_id}
+                            appointment_duration={appointment_duration}
                             date={selectedDate.date}
                             patientId={patientId}
                             schedule_date={schedule_date}
@@ -274,66 +302,91 @@ const Appointments = ({
                             getAppointmentVal={getAppointmentVal}
                             fetchAppointmentData={fetchAppointmentData}
                             order={i}
+                            timeZone={timeZone || ""}
+                            socket={socket}
                           />
                         </div>
                       </div>
-                      <Link
-                        style={{
-                          flexGrow: 4,
-                        }}
-                        to={`/profile/${fromDash ? patientId : doctorId}`}
-                        className="personal--details grow hover:shadow-md hover:bg-gray-300 p-2 
-                      border-2 border-white rounded-xl bg-gray-200"
-                      >
-                        <div className="flex gap-3 flex-wrap justify-start items-center">
-                          <div className="doctor--details">
-                            <div className="personal--image">
-                              <Avatar
-                                src={
-                                  fromDash
-                                    ? uimgUrl || userPhoto
-                                    : dimgUrl || doctorPhoto
-                                }
-                                size="large"
-                              />
-                              <span className="text-gray-700 font-medium  sm:text-lg xl:text-xl">
-                                {fromDash
-                                  ? username
-                                    ? `patient. ${username}`
-                                    : "free slot"
-                                  : `Dr. ${doctorName}`}
-                              </span>
-                            </div>
-                            {appointment_state == "done" && (
-                              <Rate
-                                className="personal--rate"
-                                value={rate}
-                                disabled
-                              />
-                            )}
-                          </div>
-                          {!fromDash && (
-                            <div className="flex gap-3 justify-start items-center">
-                              <div className="doctor--more--details shadow-lg bg-gray-300 rounded p-2">
-                                <span className="text-gray-700 font-medium sm:text-sm xl:text-base">
-                                  Fees:{" "}
-                                  <span className="text-gray-400">
-                                    {fees || <StopOutlined />}
-                                  </span>
-                                </span>
-                              </div>
-                              <div className="doctor--more--details shadow-lg bg-gray-300 rounded p-2">
-                                <span className="text-gray-700 font-medium  sm:text-base xl:text-lg">
-                                  specialty:{" "}
-                                  <span className="text-gray-400 sm:text-sm xl:text-base">
-                                    {specialty || <StopOutlined />}
-                                  </span>
-                                </span>
-                              </div>
-                            </div>
+                      {appointment_state !== "free" && (
+                        <>
+                          {appointment_state !== "booked" && (
+                            <AppointmentStart
+                              appointmentDetails={{
+                                withNickName:
+                                  user?.user_id == doctorId
+                                    ? username
+                                    : doctorName,
+                                withId:
+                                  user?.user_id == doctorId
+                                    ? patientId
+                                    : doctorId,
+                                patientId,
+                                doctorId,
+                                appointment_state,
+                                appointment_type,
+                              }}
+                            />
                           )}
-                        </div>
-                      </Link>
+                          <Link
+                            style={{
+                              flexGrow: 4,
+                            }}
+                            to={`/profile/${fromDash ? patientId : doctorId}`}
+                            className="personal--details hover:shadow-md hover:bg-gray-300 p-2 
+                        border-2 border-white rounded-xl bg-gray-200"
+                          >
+                            <div className="flex gap-3 flex-wrap justify-between md:justify-evenly items-center">
+                              <div className="doctor--details">
+                                <div className="personal--image flex gap-1">
+                                  <Avatar
+                                    src={
+                                      fromDash
+                                        ? uimgUrl || userPhoto
+                                        : dimgUrl || doctorPhoto
+                                    }
+                                    size="large"
+                                  />
+                                  <span className="text-gray-700 font-medium  sm:text-lg xl:text-xl">
+                                    {fromDash
+                                      ? username
+                                        ? `patient. ${username}`
+                                        : "free slot"
+                                      : `Dr. ${doctorName}`}
+                                  </span>
+                                </div>
+
+                                <Rate
+                                  className="personal--rate"
+                                  value={rate}
+                                  disabled
+                                />
+                              </div>
+                              {!fromDash && (
+                                <DoctorDetails
+                                  data={[
+                                    {
+                                      label: "Clinic City",
+                                      value: clinic_city,
+                                    },
+                                    {
+                                      label: "Clinic Street",
+                                      value: clinic_street,
+                                    },
+                                    {
+                                      label: "fees",
+                                      value: fees,
+                                    },
+                                    {
+                                      label: "specialty",
+                                      value: specialty,
+                                    },
+                                  ]}
+                                />
+                              )}
+                            </div>
+                          </Link>
+                        </>
+                      )}
                     </div>
                   </div>
                 )
@@ -366,12 +419,18 @@ const Appointments = ({
       )}
       {
         <PopUp
-          show={!!cancelAppoint}
-          handleClose={() => setCancelAppoint(null)}
+          show={showPop?.show}
+          handleClose={() => {
+            setShowPop((val) => ({ ...val, show: false }));
+            setTimeout(
+              () => setShowPop((val) => ({ ...val, data: null })),
+              400
+            );
+          }}
           closeColor={"!text-red-800/80 hover:!text-red-800"}
         >
           <div className="text-center text-sm sm:text-lg p-2 bg-blue-400 text-white font-medium rounded-lg">
-            {`${cancelAppoint?.bookedSlot} already booked`}
+            {`${showPop?.data?.bookedSlot} already booked`}
             <br /> Are you sure that you want cancel it ?
           </div>
           <div className="flex justify-center gap-2 p-2 mt-4">
@@ -407,7 +466,13 @@ const Appointments = ({
               Apply
             </div>
             <div
-              onClick={() => setCancelAppoint(null)}
+              onClick={() => {
+                setShowPop((val) => ({ ...val, show: false }));
+                setTimeout(
+                  () => setShowPop((val) => ({ ...val, data: null })),
+                  400
+                );
+              }}
               className="cursor-pointer text-center !bg-blue-400 p-2 text-white font-medium rounded-lg shadow-sm"
             >
               Cancel

@@ -24,46 +24,82 @@ const DoctorCard = ({
   doctorName,
   doctorId,
   user,
+  socket,
+  timeZone,
+  city,
+  street,
+  phone,
 }) => {
   const navigate = useNavigate();
+  const [isPayment, setIsPayment] = useState();
   const cardDetails = [
     {
-      label: "Specialty",
-      value: specialty,
+      data: [
+        {
+          label: "Specialty",
+          value: specialty,
+        },
+        {
+          label: "Clinic Location",
+          value: city,
+        },
+      ],
     },
     {
-      label: "Fees",
-      value: fees,
+      data: [
+        {
+          label: "Fees",
+          value: fees,
+        },
+        {
+          label: "Street",
+          value: street,
+        },
+      ],
     },
     {
-      label: "About",
-      value: about,
+      data: [
+        {
+          label: "About",
+          value: about,
+        },
+        {
+          label: "phone",
+          value: phone,
+        },
+      ],
     },
   ];
   return (
-    <Link
-      to={user?.user_name == username ? `/dashboard` : `/profile/${username}`}
-      onClick={() => window.localStorage.setItem("dashType", "profile")}
-      className="w-1/2 grow !my-2 sm:!m-2 xl:w-1/3 2xl:w-1/4"
-    >
+    <div className={`w-1/2 grow !cursor-default !my-2 sm:!m-2 xl:w-1/3`}>
       <Card
-        className="!p-2"
+        className="!p-2 !h-full"
         hoverable
         // cover={
 
         // }
         title={
-          <div className="flex gap-3 items-center">
-            <div
-              style={{
-                fontSize: "20px",
-              }}
-              className="font-serif grow text-center whitespace-nowrap"
-            >
-              {"Dr. "}
-              {doctorName || "Doctor"}
+          <Link
+            to={
+              user?.user_name == username
+                ? `/dashboard`
+                : `/profile/${username}`
+            }
+            className="w-full  text-gray-700"
+            onClick={() => window.localStorage.setItem("dashType", "profile")}
+          >
+            <div className="flex gap-3 items-center">
+              <div
+                style={{
+                  fontSize: "20px",
+                }}
+                className="font-serif grow text-center whitespace-nowrap"
+              >
+                {"Dr. "}
+                {doctorName || "Doctor"}
+              </div>
             </div>
-          </div>
+          </Link>
         }
         bodyStyle={{
           padding: "5px",
@@ -72,7 +108,13 @@ const DoctorCard = ({
       >
         <div className="flex flex-col sm:flex-row">
           <SlotsContextProvider>
-            <BookCard doctorId={doctorId} />
+            <BookCard
+              setIsPayment={setIsPayment}
+              isPayment={isPayment}
+              doctorId={doctorId}
+              socket={socket}
+              timeZone={timeZone || ""}
+            />
           </SlotsContextProvider>
           <div className="doctor--details mt-2 flex flex-col justify-between gap-2 grow">
             <div className="doctor--image text-center">
@@ -94,16 +136,20 @@ const DoctorCard = ({
               </div>
             </div>
             <div className="grow">
-              {cardDetails?.map(({ label, value }) => (
-                <div key={label}>
+              {cardDetails?.map(({ data }, i) => (
+                <div key={i + 1}>
                   <hr className="border-1 m-2 border-gray-300 shadow-lg" />
-                  <div className="font-bold font-mono">
-                    <span>{label}: </span>
-                    {value ? (
-                      <span className="text-blue-800">{value}</span>
-                    ) : (
-                      <StopOutlined />
-                    )}
+                  <div className="flex flex-wrap justify-between gap-1 font-bold font-mono">
+                    {data?.map(({ label, value }) => (
+                      <div key={label}>
+                        <span>{label}: </span>
+                        {value ? (
+                          <span className="text-blue-800">{value}</span>
+                        ) : (
+                          <StopOutlined />
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -121,8 +167,8 @@ const DoctorCard = ({
             >
               <div
                 className="!flex !justify-center !items-center !hover:bg-yellow-700 !bg-yellow-500 
-          hover:!text-black gap-2
-          rounded  !w-full !text-gray-700"
+              hover:!text-black gap-2
+              rounded  !w-full !text-gray-700"
                 style={{
                   height: "35px",
                 }}
@@ -145,7 +191,7 @@ const DoctorCard = ({
           </div>
         </div>
       </Card>
-    </Link>
+    </div>
   );
 };
 

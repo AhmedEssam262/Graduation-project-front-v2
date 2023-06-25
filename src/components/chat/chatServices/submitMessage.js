@@ -42,10 +42,8 @@ const submitMessage = async (
         }`,
         message_to,
         message_from: user_id,
-        issued_date: new Date(new Date().getTime() + 60 * 60 * 1000 * 2)
-          .toISOString()
-          .slice(0, 10),
-        issued_time: new Date().toLocaleTimeString(),
+        issued_date: res?.data?.data?.issued_date,
+        issued_time: res?.data?.data?.issued_time,
       });
       fetchMessagesData(
         cookies?.get("accessToken"),

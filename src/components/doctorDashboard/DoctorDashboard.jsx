@@ -23,6 +23,7 @@ const DoctorDashboard = ({
   messageApi,
   socket,
   setNavActive,
+  timeZone,
 }) => {
   const userid = user?.user_id;
   const username = user?.user_name;
@@ -46,6 +47,8 @@ const DoctorDashboard = ({
   useEffect(() => {
     return () => setNavActive(true);
   }, []);
+  //const isVerified = true;
+
   const isVerified = dashboardData?.is_verified;
   return (
     <div className={`${isMobile ? "flex" : ""} grow overflow-hidden  w-full`}>
@@ -73,6 +76,7 @@ const DoctorDashboard = ({
                 offsetWidth={100}
                 buttonLabel="Schedule"
                 userid={userid}
+                timeZone={timeZone}
                 fetchUserData={fetchUserData}
               />
             </SlotsContextProvider>
@@ -85,6 +89,7 @@ const DoctorDashboard = ({
           >
             <Appointments
               setDashType={setDashType}
+              timeZone={timeZone}
               messageApi={messageApi}
               user={user}
               fetchUserData={fetchUserData}
@@ -98,6 +103,7 @@ const DoctorDashboard = ({
               user={user}
               fetchUserData={fetchUserData}
               messageApi={messageApi}
+              timeZone={timeZone}
             />
           </ChatContextProvider>
         ) : dashType == "statistics" ? (

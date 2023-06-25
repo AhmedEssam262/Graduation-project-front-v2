@@ -1,92 +1,23 @@
-import { Button, DatePicker, Form, Input, Select } from "antd";
+import { Button, Form, Input, Select } from "antd";
 import React from "react";
-import HeaderLine from "../../../sign/signup/signupUtils/HeaderLine";
 import { prefixSelector } from "../../../sign/signup/signupUtils/utils";
-import { MailOutlined } from "@ant-design/icons";
-import { useMediaQuery } from "react-responsive";
-import submitPersonal from "../profileServices/submitPersonal";
 import ProfileTable from "./ProfileTable";
 import { cityOption } from "../../../sign/signup/signupUtils/signData";
+import submitClinic from "../profileServices/submitClinic";
 const { Item } = Form;
-const { Option } = Select;
-const PersonalForm = ({
+const ClinicForm = ({
   messageApi,
   fetchProfileData,
   fetchUserData,
   userName,
   initialValues,
 }) => {
-  const isMobile = useMediaQuery({
-    query: "(max-width:660px)",
-  });
   const editData = [
-    {
-      headers: ["Personal"],
-      data: [
-        {
-          name: "nickname",
-          value: (
-            <Item
-              className="!mb-0"
-              name="nickname"
-              rules={[
-                {
-                  required: true,
-                  message: "Please write your nickname!",
-                },
-              ]}
-            >
-              <Input placeholder="nickname" />
-            </Item>
-          ),
-        },
-        {
-          name: "gender",
-          value: (
-            <Item
-              className="!mb-0"
-              name="gender"
-              rules={[{ required: true, message: "Please select gender!" }]}
-            >
-              <Select placeholder="Select your gender">
-                <Option value="male">Male</Option>
-                <Option value="female">Female</Option>
-              </Select>
-            </Item>
-          ),
-        },
-        {
-          name: "birth",
-          value: (
-            <Item
-              className="!mb-0"
-              name="birth"
-              rules={[
-                {
-                  required: true,
-                  message: "you enter your birthdate",
-                },
-                {
-                  message: "your age must be more than 13",
-                  validator(_, value) {
-                    if (new Date().getFullYear() - value?.year() < 13)
-                      return Promise.reject();
-                    else return Promise.resolve();
-                  },
-                },
-              ]}
-            >
-              <DatePicker style={{ width: "100%" }} placeholder="birthdate" />
-            </Item>
-          ),
-        },
-      ],
-    },
     {
       headers: ["Contact"],
       data: [
         {
-          name: "Phone Number",
+          name: "Clinic Phone Number",
           value: (
             <Item
               className="!mb-0"
@@ -94,7 +25,7 @@ const PersonalForm = ({
               rules={[
                 {
                   required: true,
-                  message: "Please write your phone number!",
+                  message: "Please write clinic phone number!",
                 },
                 {
                   message:
@@ -104,30 +35,20 @@ const PersonalForm = ({
               ]}
             >
               <Input
-                placeholder="Your phone number"
+                placeholder="Clinic phone number"
                 addonBefore={prefixSelector}
               />
             </Item>
           ),
         },
         {
-          name: "Email",
+          name: "Clinic Telephone",
           value: (
-            <Item
-              className="!mb-0"
-              name="email"
-              rules={[
-                {
-                  required: true,
-                  message: "you must write your email!",
-                },
-                {
-                  type: "email",
-                  message: "write correct email please!!",
-                },
-              ]}
-            >
-              <Input prefix={<MailOutlined />} placeholder="Your email" />
+            <Item className="!mb-0" name="telephone">
+              <Input
+                placeholder="Clinic telephone"
+                addonBefore={prefixSelector}
+              />
             </Item>
           ),
         },
@@ -139,18 +60,16 @@ const PersonalForm = ({
       <Form
         initialValues={{ ...initialValues }}
         onFinish={(values) =>
-          submitPersonal(
+          submitClinic(
             values,
             messageApi,
             fetchProfileData,
             fetchUserData,
-            userName
+            userName,
+            true
           )
         }
       >
-        {editData?.map(({ data, headers }, i) => (
-          <ProfileTable key={i + 1} data={data} headers={headers} />
-        ))}
         <div>
           <Item className="!w-full">
             <Input.Group className="!w-full">
@@ -194,17 +113,20 @@ const PersonalForm = ({
                           },
                         ]}
                       >
-                        <Input placeholder="Your street" />
+                        <Input placeholder="Clinic street" />
                       </Item>
                     ),
                   },
                 ]}
-                headers={["Address"]}
+                headers={["Clinic Location"]}
               />
             </Input.Group>
           </Item>
         </div>
-        <div className="flex justify-center">
+        {editData?.map(({ data, headers }, i) => (
+          <ProfileTable key={i + 1} data={data} headers={headers} />
+        ))}
+        <div className="flex mt-2 justify-end">
           <Button
             type="primary"
             htmlType="submit"
@@ -214,8 +136,8 @@ const PersonalForm = ({
               fontSize: "28px",
             }}
             className={`!rounded-lg !text-xs lg:!text-sm
-          !bg-gray-600 !py-6 !font-medium 
-          !border-gray-700 !px-8 !flex !items-center hover:!bg-gray-700`}
+              !bg-gray-600 !py-4 !font-medium 
+              !border-gray-700 !px-8 !flex !items-center hover:!bg-gray-700`}
           >
             Edit Now
           </Button>
@@ -225,4 +147,4 @@ const PersonalForm = ({
   );
 };
 
-export default PersonalForm;
+export default ClinicForm;

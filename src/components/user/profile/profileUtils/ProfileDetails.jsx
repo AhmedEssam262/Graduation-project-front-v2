@@ -42,6 +42,7 @@ const ProfileDetails = ({
   userValues,
   username,
   setHandleDrawer,
+  fetchFeedback,
 }) => {
   const profileDetails = [
     !isUser
@@ -73,10 +74,6 @@ const ProfileDetails = ({
       headers: ["Address"],
       data: [
         {
-          label: "Province",
-          name: "province",
-        },
-        {
           label: "City",
           name: "city",
         },
@@ -101,7 +98,11 @@ const ProfileDetails = ({
     <>
       {!isUser ? (
         <FeedbackContextProvider noDirectFetch>
-          <Feedbacks noDirectFetch username={username} />
+          <Feedbacks
+            noDirectFetch
+            username={username}
+            fetchFeedback={fetchFeedback}
+          />
         </FeedbackContextProvider>
       ) : (
         <></>
@@ -147,7 +148,7 @@ my-5 rounded-xl"
                 ...draw,
                 isOpen: true,
                 type: "personal",
-                name: "My Personal Information",
+                name: "My Personal Informations",
               }))
             }
             className="bg-gray-300/50 gap-2 hover:bg-gray-300/80 flex justify-center items-center h-24 text-center cursor-pointer text-gray-500
@@ -157,7 +158,7 @@ my-5 rounded-xl"
             }}
           >
             <FaNotesMedical className="w-7 h-7" />
-            Edit Personal Information
+            Edit Personal Informations
           </div>
         )}
       </div>

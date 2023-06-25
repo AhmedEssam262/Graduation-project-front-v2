@@ -14,11 +14,21 @@ import {
   BsPersonPlus,
   BsPersonSquare,
 } from "react-icons/bs";
+import userPhoto from "../../images/userPhoto.png";
+import doctorPhoto from "../../images/doctorPhoto.png";
 import { Link } from "react-router-dom";
 import { AiOutlineArrowLeft, AiOutlineArrowUp } from "react-icons/ai";
 
-const Chat = ({ isAdmin, isChat, fetchUserData, user, messageApi, socket }) => {
-  const { fetchChatData, chatData, isLoading } = useChatContext();
+const Chat = ({
+  isAdmin,
+  isChat,
+  fetchUserData,
+  user,
+  messageApi,
+  socket,
+  timeZone,
+}) => {
+  const { fetchChatData, chatData, isLoading, isError } = useChatContext();
   const isMobile = useMediaQuery({
     query: "(max-width:678px)",
   });
@@ -64,8 +74,10 @@ const Chat = ({ isAdmin, isChat, fetchUserData, user, messageApi, socket }) => {
       }}
       className={`flex ${isMobile && "flex-col"}`}
     >
-      {chatData?.length ? (
+      {
+        // chatData?.length ?
         <Cards
+          isLoading={isLoading}
           withUser={withUser}
           setWithUser={setWithUser}
           chatData={chatData}
@@ -73,19 +85,21 @@ const Chat = ({ isAdmin, isChat, fetchUserData, user, messageApi, socket }) => {
           me={me}
           userId={user?.user_id}
         />
-      ) : isLoading ? (
-        <Loader />
-      ) : // (
-      //   <Empty
-      //     className="!flex !flex-col !justify-center !items-center"
-      //     description={
-      //       <span className="text-gray-700 font-medium">
-      //         There's no Users exist
-      //       </span>
-      //     }
-      //   />
-      // )
-      null}
+        // : isLoading ? (
+        // <Loader />
+        // ) :
+        // (
+        //   <Empty
+        //     className="!flex !flex-col !justify-center !items-center"
+        //     description={
+        //       <span className="text-gray-700 font-medium">
+        //         There's no Users exist
+        //       </span>
+        //     }
+        //   />
+        // )
+        // null
+      }
       {withUser ? (
         <div
           style={{
@@ -93,10 +107,19 @@ const Chat = ({ isAdmin, isChat, fetchUserData, user, messageApi, socket }) => {
           }}
           className="grow justify-between flex flex-col bg-gray-200 text-gray-700 px-2"
         >
-          {!isMobile && (
-            <div className="flex justify-between rounded-md p-2 bg-white items-center border-gray-100 shadow-sm">
+          {!isMobile && !isError && (
+            <div className="flex justify-between border-b border-gray-300 rounded-md p-2 bg-white items-center border-gray-100 shadow-sm">
               <div className="flex gap-2 items-center">
-                <Avatar src={chatRecord?.img_url}>U</Avatar>
+                <Avatar
+                  src={
+                    chatRecord?.img_url ||
+                    (chatRecord?.user_type == "doctor"
+                      ? doctorPhoto
+                      : userPhoto)
+                  }
+                >
+                  {chatRecord?.nick_name?.[0]?.toUpperCase()}
+                </Avatar>
                 <div>
                   <div className="text-gray-700 font-medium">
                     {me ? "ME" : chatRecord?.nick_name}
@@ -118,12 +141,20 @@ const Chat = ({ isAdmin, isChat, fetchUserData, user, messageApi, socket }) => {
           <MessagesContextProvider fetchUserData={fetchUserData}>
             <Messages
               key={withUser || "user"}
+              isOpen={
+                user?.user_type == "user" && withUser !== user?.user_id
+                  ? chatRecord?.is_open == 1
+                  : chatRecord?.is_open != 0
+              }
+              withNickName={chatRecord?.nick_name}
               socket={socket}
               withUser={withUser}
+              withUserType={chatRecord?.user_type}
               user_id={user?.user_id}
               isMobile={isMobile}
               fetchUserData={fetchUserData}
               messageApi={messageApi}
+              timeZone={timeZone || ""}
               isNew={!(chatRecord?.chat_from && chatRecord?.chat_to)}
             />
           </MessagesContextProvider>
@@ -164,7 +195,7 @@ const Chat = ({ isAdmin, isChat, fetchUserData, user, messageApi, socket }) => {
                 to="/doctors"
                 className="p-3 sm:p-4 text-xl sm:text-3xl rounded-lg !text-white bg-gray-800 hover:bg-gray-900 rouned"
               >
-                Chat with doctor Now
+                Chat with Doctor Now
               </Link>
             </>
           )}

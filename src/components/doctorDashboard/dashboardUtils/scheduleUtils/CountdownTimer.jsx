@@ -111,23 +111,26 @@ function updateTimeSection(sectionID, timeValue) {
   updateTimeSegment(timeSegments[1], secondNumber);
 }
 
-function updateAllSegments(hours, minutes, order) {
+function updateAllSegments(hours, minutes, order, directHour) {
   updateTimeSection(`minutes--${order}`, minutes);
-  updateTimeSection(`hours--${order}`, hours);
+  updateTimeSection(`hours--${order}`, directHour || hours);
 }
 const CountdownTimer = ({
   order,
   appointmentDetails,
   setAppointmentDetails,
   isEdit,
+  directMode,
+  directHour,
 }) => {
   useEffect(() => {
     updateAllSegments(
       appointmentDetails.slotTime.h,
       appointmentDetails.slotTime.m,
-      order
+      order,
+      directHour
     );
-  }, []);
+  }, [directHour]);
   const hours = appointmentDetails?.slotTime?.h;
   const minutes = appointmentDetails?.slotTime?.m;
   // const time = new Date().toLocaleString("en", {
@@ -146,7 +149,12 @@ const CountdownTimer = ({
                 "inc",
                 setAppointmentDetails
               );
-              updateAllSegments(h, appointmentDetails.slotTime.m, order);
+              updateAllSegments(
+                h,
+                appointmentDetails.slotTime.m,
+                order,
+                directHour
+              );
               setAppointmentDetails((appDet) => ({
                 ...appDet,
                 slotTime: {
@@ -164,7 +172,12 @@ const CountdownTimer = ({
                 "dec",
                 setAppointmentDetails
               );
-              updateAllSegments(h, appointmentDetails.slotTime.m, order);
+              updateAllSegments(
+                h,
+                appointmentDetails.slotTime.m,
+                order,
+                directHour
+              );
               setAppointmentDetails((appDet) => ({
                 ...appDet,
                 slotTime: {
@@ -218,7 +231,12 @@ const CountdownTimer = ({
           <BsFillArrowUpSquareFill
             onClick={() => {
               const m = handleMinutes(appointmentDetails.slotTime.m, "inc");
-              updateAllSegments(appointmentDetails.slotTime.h, m, order);
+              updateAllSegments(
+                appointmentDetails.slotTime.h,
+                m,
+                order,
+                directHour
+              );
               setAppointmentDetails((appDet) => ({
                 ...appDet,
                 slotTime: {
@@ -232,7 +250,12 @@ const CountdownTimer = ({
           <BsFillArrowDownSquareFill
             onClick={() => {
               const m = handleMinutes(appointmentDetails.slotTime.m, "dec");
-              updateAllSegments(appointmentDetails.slotTime.h, m, order);
+              updateAllSegments(
+                appointmentDetails.slotTime.h,
+                m,
+                order,
+                directHour
+              );
               setAppointmentDetails((appDet) => ({
                 ...appDet,
                 slotTime: {
@@ -312,7 +335,7 @@ const CountdownTimer = ({
         {/* )} */}
         <span className="text-2xl sm:text-3xl text-blue-500 font-medium">
           {/* {isEvening ? "PM" : appointmentDetails.slotTime.timeMode} */}
-          {appointmentDetails.slotTime.timeMode}
+          {directMode || appointmentDetails.slotTime.timeMode}
         </span>
       </div>
     </div>

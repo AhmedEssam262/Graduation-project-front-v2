@@ -18,6 +18,7 @@ const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
   const [searchFilter, setSearchFilter] = useState({
     specialty: window.localStorage.getItem("specialty") || "",
     doctorName: window.localStorage.getItem("doctorName") || "",
+    location: window.localStorage.getItem("location") || "",
   });
   const searchElement = useRef(null);
   const [heightSearch, setHeightSearch] = useState(0);
@@ -44,6 +45,7 @@ const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
     ref,
     () => ({
       doctorName: searchFilter.doctorName,
+      location: searchFilter.location,
       specialtyValue: searchFilter.specialty,
       setSearchFilter,
     }),
@@ -52,9 +54,11 @@ const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
   useEffect(() => {
     window.localStorage.setItem("specialty", searchFilter.specialty);
     window.localStorage.setItem("doctorName", searchFilter.doctorName);
+    window.localStorage.setItem("location", searchFilter.location);
     fetchDoctorsData({
       specialty: searchFilter.specialty,
       dname: searchFilter.doctorName,
+      location: searchFilter.location,
     });
   }, [searchFilter]);
   return (
@@ -142,6 +146,24 @@ const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
               placeholder="your doctor name"
             />
           </div>
+          <div className="grow w-full sm:w-1/3">
+            <HeaderLine
+              value="location"
+              classLine="w-full sm:w-1/3  h-3"
+              size="sm"
+              font="medium"
+            />
+            <Input
+              onChange={(e) =>
+                setSearchFilter((searchFilter) => ({
+                  ...searchFilter,
+                  location: e?.target?.value,
+                }))
+              }
+              value={searchFilter.location}
+              placeholder="your Location"
+            />
+          </div>
         </div>
         <div className="flex justify-between mt-3">
           <Button
@@ -150,6 +172,7 @@ const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
               setSearchFilter(() => ({
                 specialty: "",
                 doctorName: "",
+                location: "",
               }));
             }}
             className="!bg-red-400 !rounded-lg"

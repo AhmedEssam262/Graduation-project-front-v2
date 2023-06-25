@@ -19,21 +19,43 @@ import { useStripe } from "@stripe/react-stripe-js";
 import BookButton from "./appointmentUtils/BookButton";
 import { useUserContext } from "../../contexts/UserContextProvider";
 const { Title } = Typography;
-function BookAppointment({ userid, doctorId, socket }) {
-  const [isBookLoading, setIsBookLoading] = useState(false);
+function BookAppointment({ userid, doctorId, socket, timeZone }) {
   const { slotsData, isLoading, fetchSlotsData } = useSlotsContext();
-  const { fetchUserData } = useUserContext();
+  const [bookedAppointment, setBookedAppointment] = useState(null);
+  const { fetchUserData, messageApi } = useUserContext();
+  const [isBookLoading, setIsBookLoading] = useState(false);
   const [isPayment, setIsPayment] = useState();
   const [appointmentSuccess, setAppointmentSuccess] = useState();
-  const location = useLocation();
-  const [messageApi, contextHolder] = message.useMessage();
   const [freeSlots, setFreeSlots] = useState(null);
-  const [bookedAppointment, setBookedAppointment] = useState(null);
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState(() => dayjs());
+  const bDate = window?.localStorage?.getItem("book_date");
+  const [selectedDate, setSelectedDate] = useState(() =>
+    bDate
+      ? dayjs(bDate) > dayjs() &&
+        dayjs(bDate).$M == dayjs().$M &&
+        dayjs(bDate).$y == dayjs().$y
+        ? dayjs(bDate)
+        : dayjs()
+      : dayjs()
+  );
   const clientSecret = new URLSearchParams(window.location.search).get(
     "payment_intent_client_secret"
   );
+  const appointmentId = window?.localStorage?.getItem("book_appointment");
+  useEffect(() => {
+    if (appointmentId && !bookedAppointment && !isPayment && !isLoading) {
+      const appDetails = freeSlots?.filter(
+        ({ appointmentId: appointment_id }) => appointmentId == appointment_id
+      );
+      if (appDetails) {
+        setIsPayment("payment_processing");
+        setBookedAppointment(appDetails?.[0]);
+      }
+    }
+    if (appointmentId && !isLoading)
+      window.localStorage.removeItem("book_appointment");
+  }, [appointmentId, freeSlots]);
+  console.log(isPayment);
   useEffect(() => {
     const handleBook = async () => {
       const stripe = await getStripe();
@@ -44,37 +66,28 @@ function BookAppointment({ userid, doctorId, socket }) {
         switch (paymentIntent.status) {
           case "succeeded":
             const appointmentRecord = JSON.parse(paymentIntent?.description);
-            setIsPayment("payment_success");
-            setAppointmentSuccess(appointmentRecord);
             if (
-              freeSlots?.some(
-                ({ appointmentId }) =>
-                  appointmentId == appointmentRecord?.appointmentId
-              ) &&
-              !isBookLoading &&
-              isPayment !== "payment_success"
+              appointmentRecord?.schedule_date ==
+              selectedDate?.format("YYYY-MM-DD")
             ) {
-              bookAppointment(
-                dayjs(selectedDate),
-                appointmentRecord?.slotTime,
-                appointmentRecord?.appointmentId,
-                messageApi,
-                fetchSlotsData,
-                doctorId,
-                setBookedAppointment,
-                fetchUserData,
-                setIsBookLoading,
-                null,
-                null,
-                null,
-                socket
+              setIsPayment("payment_success");
+              setAppointmentSuccess(appointmentRecord);
+            } else {
+              setSelectedDate(
+                dayjs(
+                  appointmentRecord?.schedule_date ||
+                    appointmentRecord?.selected_date
+                )
               );
             }
         }
       });
     };
     handleBook();
-  }, [clientSecret, freeSlots]);
+  }, [clientSecret]);
+  useEffect(() => {
+    setFreeSlots(slotsData?.freeSlots);
+  }, [slotsData, selectedDate?.format("YYYY-MM-DD")]);
   useEffect(() => {
     socket.emit("join_appointments", doctorId);
   }, []);
@@ -100,14 +113,12 @@ function BookAppointment({ userid, doctorId, socket }) {
       socket.off("update_slots", getSlots);
     };
   }, [selectedDate, doctorId]);
-  useEffect(() => {
-    setFreeSlots(slotsData?.freeSlots);
-  }, [slotsData, selectedDate?.format("YYYY-MM-DD")]);
   const handleDate = (val) => {
     setSelectedDate(val);
+    window?.localStorage?.setItem("book_date", val?.format("YYYY-MM-DD"));
   };
   const isToday = (val) =>
-    new Date(selectedDate.format("YYYY-MM-DD") + " " + val) >
+    new Date(selectedDate.format("YYYY-MM-DD") + " " + val + timeZone) >
     Date.now() + 1000 * 60;
   const isUpToDate =
     selectedDate?.$d?.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0);
@@ -117,7 +128,6 @@ function BookAppointment({ userid, doctorId, socket }) {
   return (
     <div>
       <div className={`schedule--wrapper m-2 p-3 rounded`}>
-        {contextHolder}
         <Title className="!text-gray-700 !text-center !text-lg sm:!text-2xl lg:!text-3xl 2xl:!text-4xl">
           {title}
         </Title>
@@ -130,7 +140,7 @@ function BookAppointment({ userid, doctorId, socket }) {
                 className="!mt-2"
                 description={
                   <span className="font-medium text-gray-700">
-                    there's no slots available yet
+                    there's no Appointments available yet
                   </span>
                 }
               />
@@ -144,6 +154,7 @@ function BookAppointment({ userid, doctorId, socket }) {
                         appointmentType,
                         appointmentFees,
                         appointmentState,
+                        schedule_date,
                       },
                       i
                     ) =>
@@ -164,6 +175,8 @@ function BookAppointment({ userid, doctorId, socket }) {
                         >
                           <BookButton
                             slotTime={value}
+                            schedule_date={schedule_date}
+                            timeZone={timeZone}
                             appointmentState={appointmentState}
                             appointmentType={appointmentType}
                             appointmentFees={appointmentFees}
@@ -201,8 +214,16 @@ function BookAppointment({ userid, doctorId, socket }) {
                   >
                     <Button
                       onClick={() => {
-                        // if (bookedAppointment && isUser)
-                        setIsPayment("payment_processing");
+                        if (isToday(bookedAppointment?.slotTime)) {
+                          // if (bookedAppointment && isUser)
+                          setIsPayment("payment_processing");
+                        } else {
+                          messageApi?.open({
+                            content: "choose recently date",
+                            duration: 3,
+                            type: "warning",
+                          });
+                        }
                       }}
                       type="primary"
                       className={`!my-4 m-auto sm:!font-medium !h-12 w-full sm:w-2/3 2xl:w-1/2 !block ${
@@ -219,7 +240,7 @@ function BookAppointment({ userid, doctorId, socket }) {
                     className="!mt-2"
                     description={
                       <span className="font-medium text-gray-700">
-                        all slots booked
+                        all Appointments booked
                       </span>
                     }
                   />
@@ -237,6 +258,7 @@ function BookAppointment({ userid, doctorId, socket }) {
                 if (isPayment == "payment_success") {
                   navigate(`/profile/${doctorId}`);
                 }
+                setAppointmentSuccess(null);
                 setIsPayment(null);
               }}
             >
@@ -248,6 +270,7 @@ function BookAppointment({ userid, doctorId, socket }) {
                   doctorId={doctorId}
                   setBookedAppointment={setBookedAppointment}
                   messageApi={messageApi}
+                  socket={socket}
                   // AppointmentType={app}
                 />
               ) : isPayment == "payment_success" || appointmentSuccess ? (

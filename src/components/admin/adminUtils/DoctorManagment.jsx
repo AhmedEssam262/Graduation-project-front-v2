@@ -7,17 +7,24 @@ import "./DoctorManagment.css";
 import changeState from "../adminServices/changeState";
 import { useUserContext } from "../../../contexts/UserContextProvider";
 import AppointmentDetails from "./AppointmentDetails";
+import doctorPhoto from "../../../images/doctorPhoto.png";
+import { Link } from "react-router-dom";
+import PopUp from "../../utils/PopUp";
+import ClinicDetails from "../../user/profile/profileUtils/ClinicDetails";
 const columns = [
   Table.EXPAND_COLUMN,
   {
     title: "Name",
     dataIndex: "name",
     key: "name",
-    render: (rec) => (
-      <div className="flex flex-col justify-center items-center gap-2">
-        <Avatar src={rec?.img_url} />
-        <span className="font-medium">{rec?.nick_name}</span>
-      </div>
+    render: (rec, record) => (
+      <Link
+        to={`/profile/${record?.key}`}
+        className="flex flex-col bg-gray-200/80 hover:bg-gray-200 px-4 py-2 text-center rounded-md shadow-md justify-center items-center gap-2"
+      >
+        <Avatar src={rec?.img_url || doctorPhoto} size="large" />
+        <span className="font-medium text-gray-600">{rec?.nick_name}</span>
+      </Link>
     ),
   },
   {
@@ -41,18 +48,44 @@ const columns = [
     dataIndex: "action",
   },
 ];
-const DoctorManagment = ({ socket }) => {
+const appendValue = (val1, val2) => (val1 && val2 ? `${val1} ${val2}` : "");
+const DoctorManagment = ({ socket, timeZone }) => {
   const { isLoading, doctorsData, fetchDoctorsData } = useDoctorsContext();
   const { fetchUserData, messageApi } = useUserContext();
   const [openKey, setOpenKey] = useState();
+  const [doctorRecord, setDoctorRecord] = useState();
+  const [showPopUp, setShowPopUp] = useState();
+  console.log(doctorsData);
   const [isVerLoading, setIsLoading] = useState(false);
   const doctorsDetails = doctorsData?.map(
-    ({ doctor_id, fees, img_url, nick_name, specialty, is_verified }) => ({
+    (
+      {
+        doctor_id,
+        fees,
+        img_url,
+        nick_name,
+        specialty,
+        is_verified,
+        clinic_street,
+      },
+      i
+    ) => ({
       key: doctor_id,
       specialty: <span className="">{specialty}</span>,
       verified: is_verified,
       action: (
         <div className="flex flex-col gap-2 items-center">
+          {clinic_street && (
+            <Button
+              onClick={() => {
+                setDoctorRecord(doctorsData?.[i]);
+                setShowPopUp(true);
+              }}
+              className="!bg-green-400 hover:!bg-green-600 !rounded-lg !font-medium !text-white"
+            >
+              Clinic Details
+            </Button>
+          )}
           {!is_verified && (
             <Button
               onClick={() =>
@@ -61,7 +94,7 @@ const DoctorManagment = ({ socket }) => {
                   fetchDoctorsData,
                   messageApi,
                   setIsLoading,
-                  "verified",
+                  "verify",
                   doctor_id
                 )
               }
@@ -98,6 +131,17 @@ const DoctorManagment = ({ socket }) => {
   // console.log(openKey);
   return (
     <div className="px-4 admin--table">
+      <PopUp
+        show={showPopUp}
+        mt="80px"
+        customWidth={"w-5/6 sm:w-4/5 lg:w-3/4"}
+        handleClose={() => {
+          setShowPopUp(null);
+          setTimeout(() => setDoctorRecord(null), 400);
+        }}
+      >
+        <ClinicDetails admin={true} clinicValues={doctorRecord} />
+      </PopUp>
       <div
         className="flex overflow-auto scroll--h"
         style={{
@@ -112,6 +156,7 @@ const DoctorManagment = ({ socket }) => {
                   <SlotsContextProvider>
                     <AppointmentDetails
                       socket={socket}
+                      timeZone={timeZone}
                       fetchUserData={fetchUserData}
                       messageApi={messageApi}
                       doctorId={record?.key}
@@ -133,7 +178,7 @@ const DoctorManagment = ({ socket }) => {
               //   />
               // ),
             }}
-            pagination={{ pageSize: 5 }}
+            pagination={doctorsData?.length > 4 ? { pageSize: 4 } : false}
             columns={columns}
             loading={isLoading}
             dataSource={doctorsDetails}

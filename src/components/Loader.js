@@ -1,9 +1,11 @@
 import React from "react";
 import { Spin } from "antd";
-const Loader = ({ height }) => {
+import { GridLoader } from "react-spinners";
+const Loader = ({ height, gray }) => {
   return (
-    <div>
-      <Spin
+    <div className="!my-4 flex w-full items-center justify-center">
+      <GridLoader color={gray ? "#4a5568" : "#2b6cb0"} />
+      {/* <Spin
         size="large"
         style={{
           height: `${height || "fit-content"}`,
@@ -12,7 +14,7 @@ const Loader = ({ height }) => {
           justifyContent: "center",
           alignItems: "center",
         }}
-      />
+      /> */}
     </div>
   );
 };

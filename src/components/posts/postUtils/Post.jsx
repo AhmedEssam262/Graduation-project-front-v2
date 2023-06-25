@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
   ClockCircleFilled,
-  DislikeOutlined,
-  LikeOutlined,
   LinkOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
+import { AiFillDislike, AiFillLike } from "react-icons/ai";
 import {
-  BsEmojiAngry,
+  BsEmojiAngryFill,
   BsFillArrowDownCircleFill,
   BsFillArrowUpCircleFill,
 } from "react-icons/bs";
@@ -19,9 +18,30 @@ import { Link } from "react-router-dom";
 import submitComment from "../postServices/submitComment";
 import { useCommentsContext } from "../../../contexts/CommentsContextProvider";
 import { useUserContext } from "../../../contexts/UserContextProvider";
+import submitLike from "../postServices/submitLike";
+import axios from "axios";
+import Cookies from "universal-cookie";
+import doctorPhoto from "../../../images/doctorPhoto.png";
+import userPhoto from "../../../images/userPhoto.png";
+const getLike = async (setIsLike, postId, commentId) => {
+  const host = window.location.hostname;
+  const { data } = await axios(
+    `http://127.0.0.1:8000/api/get/like?postId=${postId}${
+      commentId ? `&commentId=${commentId}` : ""
+    }`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${new Cookies()?.get("accessToken")}`,
+      },
+    }
+  );
+  setIsLike(data?.data);
+};
 const CommentActions = ({
   isComment,
   postId,
+  commentId,
   fetchCommentsData,
   setComments,
   show,
@@ -31,58 +51,144 @@ const CommentActions = ({
   showMore,
   lenViewedComments,
   isLoading,
-}) => (
-  <div className="p-2">
-    <div className="flex flex-wrap gap-1 justify-between items-center">
-      {/* <LinkOutlined className="!flex items-center !text-blue-500 !text-xl" /> */}
-      <div className="flex gap-2 items-center bg-white p-2 rounded-lg shadow-sm">
-        <LikeOutlined className="!flex hover:shadow-lg cursor-pointer rounded-full hover:!text-blue-600 items-center !fill-black !text-blue-500 !text-xl" />
-        <DislikeOutlined className="!flex hover:shadow-lg cursor-pointer rounded-full hover:!text-yellow-600 items-center !fill-black !text-yellow-500 !text-xl" />
-        <BsEmojiAngry className="!flex hover:shadow-lg cursor-pointer rounded-full hover:!text-red-800 items-center !text-red-500 !text-xl" />
-      </div>
-      {show && showMore && (
-        <div
-          onClick={() =>
-            fetchCommentsData({
-              postId,
-              limit: lenViewedComments + 5,
-            })
-          }
-          className="cursor-pointer p-2 rounded-lg hover:bg-gray-600 
+  socket,
+}) => {
+  const [likeData, setLikeData] = useState();
+  const { messageApi, fetchUserData, userData } = useUserContext();
+  useEffect(() => {
+    if (userData?.user_id) getLike(setLikeData, postId, commentId);
+  }, [userData]);
+  return (
+    <div className="p-2">
+      <div className="flex flex-wrap gap-1 justify-between items-center">
+        {/* <LinkOutlined className="!flex items-center !text-blue-500 !text-xl" /> */}
+        <div className="flex gap-2 items-center bg-white p-2 rounded-lg shadow-sm">
+          <AiFillLike
+            onClick={() => {
+              if (userData?.user_id)
+                submitLike(
+                  null,
+                  fetchUserData,
+                  fetchCommentsData,
+                  messageApi,
+                  "like",
+                  postId,
+                  commentId,
+                  !isComment,
+                  lenViewedComments,
+                  getLike,
+                  setLikeData,
+
+                  socket
+                );
+            }}
+            className={`!flex cursor-pointer rounded-full 
+            items-center p-0.5
+            ${
+              likeData?.like_type == "like"
+                ? "!fill-white bg-blue-800 !shadow-md"
+                : "!fill-blue-400/80  hover:!fill-blue-700/80 hover:!shadow-lg"
+            } !text-2xl`}
+          />
+          <AiFillDislike
+            fill="white"
+            color="red"
+            onClick={() => {
+              if (userData?.user_id)
+                submitLike(
+                  null,
+                  fetchUserData,
+                  fetchCommentsData,
+                  messageApi,
+                  "dislike",
+                  postId,
+                  commentId,
+                  !isComment,
+                  lenViewedComments,
+                  getLike,
+                  setLikeData,
+                  socket
+                );
+            }}
+            className={`!flex cursor-pointer rounded-full 
+            items-center p-0.5
+            ${
+              likeData?.like_type == "dislike"
+                ? "!fill-white bg-yellow-600 !shadow-md"
+                : "!fill-yellow-400/80 hover:!fill-yellow-700/80 hover:!shadow-lg"
+            }  !text-2xl`}
+          />
+          <BsEmojiAngryFill
+            onClick={() => {
+              if (userData?.user_id)
+                submitLike(
+                  null,
+                  fetchUserData,
+                  fetchCommentsData,
+                  messageApi,
+                  "angry",
+                  postId,
+                  commentId,
+                  !isComment,
+                  lenViewedComments,
+                  getLike,
+                  setLikeData,
+                  socket
+                );
+            }}
+            className={`!flex  cursor-pointer rounded-full 
+            items-center p-0.5
+            ${
+              likeData?.like_type == "angry"
+                ? "!fill-red-100 !bg-red-600 !shadow-md"
+                : "!fill-red-400/80 hover:!shadow-lg hover:!fill-red-700/80"
+            }  !text-2xl`}
+          />
+        </div>
+        {show && showMore && (
+          <div
+            onClick={() =>
+              fetchCommentsData({
+                postId,
+                limit: lenViewedComments + 5,
+              })
+            }
+            className="cursor-pointer p-2 rounded-lg hover:bg-gray-600 
           bg-gray-500 flex flex-wrap justify-center items-center gap-1"
-        >
-          {isLoading ? (
-            <LoadingOutlined />
-          ) : (
-            <BsFillArrowDownCircleFill
-              className="!flex hover:shadow-lg cursor-pointer 
-          rounded-full hover:!bg-gray-900 items-center 
+          >
+            {isLoading ? (
+              <LoadingOutlined />
+            ) : (
+              <BsFillArrowDownCircleFill
+                className="!flex hover:shadow-lg cursor-pointer 
+              rounded-full hover:!bg-gray-900 items-center 
           !text-gray-100 !text-xl"
-            />
-          )}
-          <span className="hidden sm:inline-block">
-            Show {isComment ? "More Comments" : "Comments"}
-          </span>
-        </div>
-      )}
-      {!isComment ? (
-        <div
-          onClick={() => setReply((val) => (val === order ? false : order))}
-          className="cursor-pointer p-2 rounded-lg text-gray-700 hover:bg-gray-100 bg-white"
-        >
-          Comment
-        </div>
-      ) : (
-        <MdReply
-          onClick={() => setReply((val) => (val === order ? false : order))}
-          className="!flex hover:shadow-lg cursor-pointer 
-        rounded-full hover:!text-blue-700 items-center 
+              />
+            )}
+            <span className="hidden sm:inline-block">
+              Show {isComment ? "More Comments" : "Comments"}
+            </span>
+          </div>
+        )}
+        {!isComment ? (
+          <div
+            onClick={() => setReply((val) => (val === order ? false : order))}
+            className="cursor-pointer p-2 rounded-lg text-gray-700 hover:bg-gray-100 bg-white"
+          >
+            Comment
+          </div>
+        ) : (
+          <MdReply
+            onClick={() => setReply((val) => (val === order ? false : order))}
+            className="!flex hover:shadow-lg cursor-pointer 
+          rounded-full hover:!text-blue-700 items-center 
         !text-blue-600 !text-xl"
-        />
-      )}
+          />
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 const Reply = ({
   isComment,
   setReply,
@@ -121,7 +227,7 @@ const Reply = ({
         </div>
       </div>
       <div className="p-3">
-        <Input
+        <Input.TextArea
           className="!rounded-xl !h-20 sm:!w-1/2"
           value={content}
           onChange={(e) => setContent(e?.target?.value)}
@@ -252,11 +358,13 @@ const CommentTemplate = ({
       setComments={setComments}
       fetchCommentsData={fetchCommentsData}
       postId={postId}
+      commentId={commentId}
       order={order}
       showMore={showMore}
       numComments={numComments}
       lenViewedComments={lenViewedComments}
       isLoading={isLoading}
+      socket={socket}
     />
   </div>
 );
@@ -376,12 +484,14 @@ const PostTemplate = ({
       numComments={numComments}
       lenViewedComments={lenViewedComments}
       isLoading={isLoading}
+      socket={socket}
     />
   </div>
 );
 const Post = ({
   postId,
   imgUrl,
+  userType,
   nickname,
   numAngry,
   numLike,
@@ -425,7 +535,7 @@ const Post = ({
           postImg={postImg}
           userid={userid}
           postId={postId}
-          imgUrl={imgUrl}
+          imgUrl={imgUrl || (userType == "doctor" ? doctorPhoto : userPhoto)}
           nickname={nickname}
           numAngry={numAngry}
           numDisLike={numDisLike}
@@ -461,6 +571,7 @@ const Post = ({
               {
                 comment_id: commentId,
                 user_id: userid,
+                user_type: userType,
                 img_url: imgUrl,
                 nick_name: nickname,
                 content,
@@ -474,11 +585,13 @@ const Post = ({
               i
             ) => (
               <CommentTemplate
-                key={i + 1}
+                key={commentId}
                 socket={socket}
                 userid={userid}
                 postId={postId}
-                imgUrl={imgUrl}
+                imgUrl={
+                  imgUrl || (userType == "doctor" ? doctorPhoto : userPhoto)
+                }
                 nickname={nickname}
                 numAngry={numAngry}
                 numLike={numLike}

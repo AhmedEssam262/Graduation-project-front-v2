@@ -35,7 +35,7 @@ const ProfileTable = ({
           </thead>
         )}
         <tbody>
-          {data?.map(({ name, value }, i, arr) => (
+          {data?.map(({ name, value, preValue }, i, arr) => (
             <tr key={i + 1}>
               <th
                 scope="row"
@@ -51,7 +51,13 @@ const ProfileTable = ({
                   i + 1 == arr?.length ? "" : "border-b border-gray-100"
                 } break-all text-sm sm:text-lg font-medium`}
               >
-                {value || <div className="">{icon}</div>}
+                {preValue && value ? (
+                  <>
+                    {preValue} {value}
+                  </>
+                ) : (
+                  value || <div className="">{icon}</div>
+                )}
               </td>
             </tr>
           ))}

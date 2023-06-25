@@ -6,6 +6,7 @@ import "./antd.css";
 import { UserContextProvider } from "./contexts";
 import Cookies from "universal-cookie";
 import { BrowserRouter as Router } from "react-router-dom";
+import { SkeletonTheme } from "react-loading-skeleton";
 const cookies = new Cookies();
 const DOMElement = document.getElementById("root");
 const ReactRootElement = ReactDOM.createRoot(DOMElement);
@@ -13,7 +14,9 @@ const ReactRootElement = ReactDOM.createRoot(DOMElement);
 ReactRootElement.render(
   <Router>
     <UserContextProvider token={cookies.get("accessToken")}>
-      <App />
+      <SkeletonTheme baseColor="#202020" highlightColor="#444">
+        <App />
+      </SkeletonTheme>
     </UserContextProvider>
   </Router>
 );

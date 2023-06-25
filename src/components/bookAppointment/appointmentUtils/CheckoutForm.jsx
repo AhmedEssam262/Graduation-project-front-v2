@@ -8,10 +8,12 @@ import {
 import bookAppointment from "../appointmentServices/bookAppointment";
 import { useSlotsContext } from "../../../contexts/SlotsContextProvider";
 import { useUserContext } from "../../../contexts/UserContextProvider";
+import { useNavigate } from "react-router-dom";
 
 const CheckoutForm = ({
   bookedAppointment,
   doctorId,
+  socket,
   selectedDate,
   messageApi,
   setBookedAppointment,
@@ -25,7 +27,7 @@ const CheckoutForm = ({
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (!stripe) {
       return;
@@ -34,7 +36,6 @@ const CheckoutForm = ({
     const clientSecret = new URLSearchParams(window.location.search).get(
       "payment_intent_client_secret"
     );
-    console.log(clientSecret);
 
     if (!clientSecret) {
       return;
@@ -60,7 +61,6 @@ const CheckoutForm = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("ff");
     if (!stripe || !elements) {
       // Stripe.js has not yet loaded.
       // Make sure to disable form submission until Stripe.js has loaded.
@@ -84,27 +84,44 @@ const CheckoutForm = ({
         resolve
       )
     );
-    console.log(result);
     if (result === "err") return;
     stripe
       .confirmPayment({
         elements,
-        options: {
-          handleActions: false,
-        },
-        confirmParams: {
-          // Make sure to change this to your payment completion page
-          return_url: window?.location?.href,
-        },
+
+        // options: {
+        //   handleActions: false,
+        // },
+        // confirmParams: {
+        //   // Make sure to change this to your payment completion page
+        //   return_url: `http://${window?.location?.host}/profile/${doctorId}`,
+        // },
+        redirect: "if_required",
       })
-      .then(({ error }) => {
-        if (error.type === "card_error" || error.type === "validation_error") {
-          setMessage(error.message);
+      .then((paymentIntent) => {
+        const pi = paymentIntent?.paymentIntent;
+        if (pi) {
+          bookAppointment(
+            selectedDate,
+            bookedAppointment?.slotTime,
+            bookedAppointment?.appointmentId,
+            messageApi,
+            fetchSlotsData,
+            doctorId,
+            setBookedAppointment,
+            fetchUserData,
+            setIsLoading,
+            null,
+            setIsPayment,
+            null,
+            socket,
+            pi,
+            navigate
+          );
         } else {
-          setMessage("An unexpected error occurred.");
+          setMessage(paymentIntent?.error?.message);
+          setIsLoading(false);
         }
-        setIsLoading(false);
-        if (error) console.log("err");
       });
 
     // This point will only be reached if there is an immediate error when
@@ -113,7 +130,6 @@ const CheckoutForm = ({
     // be redirected to an intermediate site first to authorize the payment, then
     // redirected to the `return_url`.
   };
-
   const paymentElementOptions = {
     layout: "tabs",
   };

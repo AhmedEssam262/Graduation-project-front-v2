@@ -26,11 +26,11 @@ const toDoctors = (val, navigate, DoctorRef) => {
   let id = setInterval(() => {
     if (DoctorRef?.current) {
       clearInterval(id);
-      const { specialtyValue, doctorName, setSearchFilter } =
+      const { specialtyValue, doctorName, location, setSearchFilter } =
         DoctorRef?.current;
       specialty = specialty == "all" ? "" : specialty;
-      if (specialty != specialtyValue || doctorName) {
-        setSearchFilter({ specialty, doctorName: "" });
+      if (specialty != specialtyValue || doctorName || location) {
+        setSearchFilter({ specialty, doctorName: "", location: "" });
       }
     }
   });
@@ -470,7 +470,7 @@ const items = (
         //</Link>
         "user",
         user?.img_url ? (
-          <Avatar src={user?.img_url} size="large" />
+          <Avatar src={user?.img_url} size="small" />
         ) : (
           <ImProfile className="!text-2xl !text-gray-200 !m-0" />
         )

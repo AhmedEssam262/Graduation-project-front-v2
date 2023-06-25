@@ -11,7 +11,7 @@ const prefixSelector = (
       },
     ]}
   >
-    <Select style={{ width: 100 }} className="bg-gray-100">
+    <Select style={{ width: 100 }} className="bg-gray-100 !flex !items-center">
       <Option data-countrycode="EG" value="20">
         +20 EG
       </Option>

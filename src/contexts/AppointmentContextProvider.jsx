@@ -26,9 +26,10 @@ const AppointmentContextProvider = ({
     directToken,
     done,
     postData,
-    query
+    query,
+    noWaiting
   ) => {
-    setIsLoading(true);
+    if (!noWaiting) setIsLoading(true);
     if (!token && !active) {
       setAppointmentData(null);
       return setIsLoading(false);
@@ -37,7 +38,7 @@ const AppointmentContextProvider = ({
       if (done) {
         const { data } = await axios.post(
           `http://127.0.0.1:8000/api/done/appointments${
-            isDoctor
+            isDoctor || query?.doctor
               ? `?doctor=true${query.date && `&date=${query.date}`}`
               : `?date=${query?.date}`
           }`,
@@ -54,8 +55,10 @@ const AppointmentContextProvider = ({
         return data;
       } else {
         const { data } = await axios.request(
-          `http://127.0.0.1:8000/api/get/appointments?date=${query.date}${
-            isDoctor ? `&doctor=true` : ""
+          `http://127.0.0.1:8000/api/get/appointments?${
+            query?.date ? `&date=${query?.date}` : ""
+          }${query?.doctorId ? `&doctor_id=${query?.doctorId}` : ""}${
+            isDoctor || query?.doctor ? `&doctor=true` : ""
           }`,
           {
             headers: {

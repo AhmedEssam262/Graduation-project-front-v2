@@ -22,7 +22,7 @@ const ProfileContextProvider = ({ children }) => {
       console.log(err);
       //setProfileData(null);
       setIsLoading(false);
-      setIsError(true);
+      if (err?.response?.status !== 400) setIsError(true);
     }
   };
   // useLayoutEffect(() => {

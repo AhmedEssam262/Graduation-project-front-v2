@@ -19,6 +19,7 @@ const handleQuery = (obj) =>
 const PostsData = createContext(null);
 const PostsContextProvider = ({ children, noFirstRender, query }) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
   const [postsData, setPostsData] = useState(null);
   const host = window?.location?.hostname;
   const fetchPostsData = async (query, noRender) => {
@@ -31,9 +32,11 @@ const PostsContextProvider = ({ children, noFirstRender, query }) => {
         }
       );
       setPostsData(() => data?.data);
+      setIsError(false);
       setIsLoading(false);
       return data;
     } catch (err) {
+      setIsError(true);
       setIsLoading(false);
       throw err;
     }
@@ -42,7 +45,9 @@ const PostsContextProvider = ({ children, noFirstRender, query }) => {
     if (!noFirstRender) fetchPostsData(query);
   }, []);
   return (
-    <PostsData.Provider value={{ isLoading, postsData, fetchPostsData }}>
+    <PostsData.Provider
+      value={{ isLoading, isError, postsData, fetchPostsData }}
+    >
       {children}
     </PostsData.Provider>
   );

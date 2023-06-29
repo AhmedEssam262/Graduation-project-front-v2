@@ -4,9 +4,16 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CgProfile } from "react-icons/cg";
 import { PoweroffOutlined } from "@ant-design/icons";
 import Cookies from "universal-cookie";
+import { useMediaQuery } from "react-responsive";
+import { useUtilsContext } from "../../../contexts/UtilsContextProvider";
 let TimeId;
+
 const UserItem = ({ user, setUserData, messageApi }) => {
+  const { t } = useUtilsContext();
   const navigate = useNavigate();
+  const isMobile = useMediaQuery({
+    query: "(max-width:678px)",
+  });
   const [showLogout, setShowLogout] = useState(false);
   useEffect(() => {
     const wrap = document.querySelector(".user--nav--wrapper");
@@ -46,7 +53,7 @@ const UserItem = ({ user, setUserData, messageApi }) => {
             {user?.nick_name || "Profile"}
           </Button>
         </Link>
-        {showLogout && (
+        {(showLogout || isMobile) && (
           <div
             style={{
               left: `calc(100% - 40px)`,

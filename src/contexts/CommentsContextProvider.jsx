@@ -19,6 +19,7 @@ const handleQuery = (obj) =>
 const CommentsData = createContext(null);
 const CommentsContextProvider = ({ children, noFirstRender, query }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [commentsData, setCommentsData] = useState(null);
   const host = window?.location?.hostname;
   const fetchCommentsData = async (query, noRender) => {
@@ -31,10 +32,12 @@ const CommentsContextProvider = ({ children, noFirstRender, query }) => {
         }
       );
       setCommentsData(() => data?.data);
+      setIsError(false);
       setIsLoading(false);
       return data;
     } catch (err) {
       setIsLoading(false);
+      setIsError(true);
       throw err;
     }
   };
@@ -43,7 +46,13 @@ const CommentsContextProvider = ({ children, noFirstRender, query }) => {
   // }, []);
   return (
     <CommentsData.Provider
-      value={{ isLoading, commentsData, fetchCommentsData }}
+      value={{
+        isLoading,
+        commentsData,
+        setCommentsData,
+        fetchCommentsData,
+        isError,
+      }}
     >
       {children}
     </CommentsData.Provider>

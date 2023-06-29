@@ -15,16 +15,15 @@ import HeaderLine from "../sign/signup/signupUtils/HeaderLine";
 import Appointments from "../appointments/Appointments";
 import AppointmentContextProvider from "../../contexts/AppointmentContextProvider";
 import Chat from "../chat/Chat";
-import Loader from "../Loader";
-const DoctorDashboard = ({
-  user,
-  fetchUserData,
-  isUserLoading,
-  messageApi,
-  socket,
-  setNavActive,
-  timeZone,
-}) => {
+import { useUtilsContext } from "../../contexts/UtilsContextProvider";
+import { useUserContext } from "../../contexts/UserContextProvider";
+const DoctorDashboard = ({ setNavActive }) => {
+  const { timeZone, messageApi, socket } = useUtilsContext();
+  const {
+    isLoading: isUserLoading,
+    userData: user,
+    fetchUserData,
+  } = useUserContext();
   const userid = user?.user_id;
   const username = user?.user_name;
   const { dashboardData, isLoading, fetchDashboardData } =
@@ -47,8 +46,6 @@ const DoctorDashboard = ({
   useEffect(() => {
     return () => setNavActive(true);
   }, []);
-  //const isVerified = true;
-
   const isVerified = dashboardData?.is_verified;
   return (
     <div className={`${isMobile ? "flex" : ""} grow overflow-hidden  w-full`}>

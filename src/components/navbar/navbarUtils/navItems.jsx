@@ -35,420 +35,403 @@ const toDoctors = (val, navigate, DoctorRef) => {
     }
   });
 };
-const subItems = [
+const subItems = (t) => [
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Internal medicine"
     >
-      Internal medicine
+      {t("Internal medicine")}
     </div>,
     "Internal"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Pediatrics">
-      Pediatrics
+    <div className="text-white font-base select-none" specialty="Pediatrics">
+      {t("Pediatrics")}
     </div>,
     "Pediatrics"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Surgery">
-      Surgery
+    <div className="text-white font-base select-none" specialty="Surgery">
+      {t("Surgery")}
     </div>,
     "Surgery"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Family medicine"
     >
-      Family medicine
+      {t("Family medicine")}
     </div>,
     "Family"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Anesthesiology"
     >
-      Anesthesiology
+      {t("Anesthesiology")}
     </div>,
     "Anesthesiology"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Neurology">
-      Neurology
+    <div className="text-white font-base select-none" specialty="Neurology">
+      {t("Neurology")}
     </div>,
     "Neurology"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Emergency medicine"
     >
-      Emergency medicine
+      {t("Emergency medicine")}
     </div>,
     "Emergency"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Dermatology">
-      Dermatology
+    <div className="text-white font-base select-none" specialty="Dermatology">
+      {t("Dermatology")}
     </div>,
     "Dermatology"
   ),
   getItem(
-    <div
-      className="text-white font-medium select-none"
-      specialty="Ophthalmology"
-    >
-      Ophthalmology
+    <div className="text-white font-base select-none" specialty="Ophthalmology">
+      {t("Ophthalmology")}
     </div>,
     "Ophthalmology"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Oncology">
-      Oncology
+    <div className="text-white font-base select-none" specialty="Oncology">
+      {t("Oncology")}
     </div>,
     "Oncology"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Obstetrics and gynaecology"
     >
-      Obstetrics and gynaecology
+      {t("Obstetrics and gynaecology")}
     </div>,
     "Obstetrics"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Psychiatry">
-      Psychiatry
+    <div className="text-white font-base select-none" specialty="Psychiatry">
+      {t("Psychiatry")}
     </div>,
     "Psychiatry"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="General surgery"
     >
-      General surgery
+      {t("General surgery")}
     </div>,
     "General"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Urology">
-      Urology
+    <div className="text-white font-base select-none" specialty="Urology">
+      {t("Urology")}
     </div>,
     "Urology"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Nuclear medicine"
     >
-      Nuclear medicine
+      {t("Nuclear medicine")}
     </div>,
     "Nuclear"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Diagnostic Radiology"
     >
-      Diagnostic Radiology
+      {t("Diagnostic Radiology")}
     </div>,
     "Diagnostic"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Immunology">
-      Immunology
+    <div className="text-white font-base select-none" specialty="Immunology">
+      {t("Immunology")}
     </div>,
     "Immunology"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Physical therap"
     >
-      Physical therapy
+      {t("Physical therapy")}
     </div>,
     "Physical"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Preventive healthcare"
     >
-      Preventive healthcare
+      {t("Preventive healthcare")}
     </div>,
     "Preventive"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Medical genetics"
     >
-      Medical genetics
+      {t("Medical genetics")}
     </div>,
     "Medical1"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Orthopedics">
-      Orthopedics
+    <div className="text-white font-base select-none" specialty="Orthopedics">
+      {t("Orthopedics")}
     </div>,
     "Orthopedics"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Cardiology">
-      Cardiology
+    <div className="text-white font-base select-none" specialty="Cardiology">
+      {t("Cardiology")}
     </div>,
     "Cardiology"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Otorhinolaryngology"
     >
-      Otorhinolaryngology
+      {t("Otorhinolaryngology")}
     </div>,
     "Otorhinolaryngology"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Gastroenterology"
     >
-      Gastroenterology
+      {t("Gastroenterology")}
     </div>,
     "Gastroenterology"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Plastic surgery"
     >
-      Plastic surgery
+      {t("Plastic surgery")}
     </div>,
     "Plastic"
   ),
   getItem(
-    <div
-      className="text-white font-medium select-none"
-      specialty="Neurosurgery"
-    >
-      Neurosurgery
+    <div className="text-white font-base select-none" specialty="Neurosurgery">
+      {t("Neurosurgery")}
     </div>,
     "Neurosurgery"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Cardiothoracic surgery"
     >
-      Cardiothoracic surgery
+      {t("Cardiothoracic surgery")}
     </div>,
     "Cardiothoracic"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Pulmonology">
-      Pulmonology
+    <div className="text-white font-base select-none" specialty="Pulmonology">
+      {t("Pulmonology")}
     </div>,
     "Pulmonology"
   ),
   getItem(
-    <div
-      className="text-white font-medium select-none"
-      specialty="Rheumatology"
-    >
-      Rheumatology
+    <div className="text-white font-base select-none" specialty="Rheumatology">
+      {t("Rheumatology")}
     </div>,
     "Rheumatology"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Intensive care medicine"
     >
-      Intensive care medicine
+      {t("Intensive care medicine")}
     </div>,
     "Intensive"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Geriatrics">
-      Geriatrics
+    <div className="text-white font-base select-none" specialty="Geriatrics">
+      {t(" Geriatrics")}
     </div>,
     "Geriatrics"
   ),
   getItem(
-    <div
-      className="text-white font-medium select-none"
-      specialty="Endocrinology"
-    >
-      Endocrinology
+    <div className="text-white font-base select-none" specialty="Endocrinology">
+      {t("Endocrinology")}
     </div>,
     "Endocrinology"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Nephrology">
-      Nephrology
+    <div className="text-white font-base select-none" specialty="Nephrology">
+      {t("Nephrology")}
     </div>,
     "Nephrology"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Hematology">
-      Hematology
+    <div className="text-white font-base select-none" specialty="Hematology">
+      {t(" Hematology")}
     </div>,
     "Hematology"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Pathology">
-      Pathology
+    <div className="text-white font-base select-none" specialty="Pathology">
+      {t("Pathology")}
     </div>,
     "Pathology"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Occupational medicine"
     >
-      Occupational medicine
+      {t("Occupational medicine")}
     </div>,
     "Occupational"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Clinical chemistry"
     >
-      Clinical chemistry
+      {t("Clinical chemistry")}
     </div>,
     "Clinical1"
   ),
   getItem(
-    <div
-      className="text-white font-medium select-none"
-      specialty="Public health"
-    >
-      Public health
+    <div className="text-white font-base select-none" specialty="Public health">
+      {t("Public health")}
     </div>,
     "Public"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Clinical pathology"
     >
-      Clinical pathology
+      {t("Clinical pathology")}
     </div>,
     "Clinical2"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Medical microbiology"
     >
-      Medical microbiology
+      {t("Medical microbiology")}
     </div>,
     "Medical2"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Pain management"
     >
-      Pain management
+      {t("Pain management")}
     </div>,
     "Pain"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Anatomical pathology"
     >
-      Anatomical pathology
+      {t("Anatomical pathology")}
     </div>,
     "Anatomical"
   ),
   getItem(
-    <div
-      className="text-white font-medium select-none"
-      specialty="Primary care"
-    >
-      Primary care
+    <div className="text-white font-base select-none" specialty="Primary care">
+      {t("Primary care")}
     </div>,
     "Primary"
   ),
   getItem(
-    <div className="text-white font-medium select-none" specialty="Radiology">
-      Radiology
+    <div className="text-white font-base select-none" specialty="Radiology">
+      {t("Radiology")}
     </div>,
     "Radiology"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Vascular surgery"
     >
-      Vascular surgery
+      {t("Vascular surgery")}
     </div>,
     "Vascular"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Pediatric Hematology Oncology"
     >
-      Pediatric Hematology Oncology
+      {t("Pediatric Hematology Oncology")}
     </div>,
     "Pediatric1"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Spinal Cord Injury Medicine"
     >
-      Spinal Cord Injury Medicine
+      {t("Spinal Cord Injury Medicine")}
     </div>,
     "Spinal"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Pediatric surgery"
     >
-      Pediatric surgery
+      {t("Pediatric surgery")}
     </div>,
     "Pediatric2"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Oral and maxillofacial surgery"
     >
-      Oral and maxillofacial surgery
+      {t("Oral and maxillofacial surgery")}
     </div>,
     "Oral"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Colorectal surgery"
     >
-      Colorectal surgery
+      {t("Colorectal surgery")}
     </div>,
     "Colorectal"
   ),
   getItem(
     <div
-      className="text-white font-medium select-none"
+      className="text-white font-base select-none"
       specialty="Developmental-Behavioral Pedia"
     >
-      Developmental-Behavioral Pedia
+      {t("Developmental-Behavioral Pedia")}
     </div>,
     "Developmental"
   ),
 ];
 const items = (
+  t,
   navigate,
   location,
   DoctorRef,
@@ -463,6 +446,7 @@ const items = (
           setUserData={setUserData}
           messageApi={messageApi}
           user={user}
+          isMobile={isMobile}
         />,
         // <div className="inline-block">logout</div>,
         //<Link to="/" className="select-none">
@@ -479,49 +463,51 @@ const items = (
   !(location.pathname == "/")
     ? getItem(
         <Link to="/" className="select-none">
-          HomePage
+          {t("HomePage")}
         </Link>,
         "1",
-        <HomeOutlined />
+        <HomeOutlined className="!text-gray-300 hover:!text-white" />
       )
     : null,
   !user
     ? getItem(
         <Link to="/login" className="select-none">
-          Login
+          {t("Login")}
         </Link>,
         "login",
-        <AiOutlineLogin />
+        <AiOutlineLogin className="!text-gray-300 hover:!text-white" />
       )
     : null,
   !user
     ? getItem(
         <Link to="/signup" className="select-none">
-          SignUp
+          {t("SignUp")}
         </Link>,
         "signup",
-        <SiGnuprivacyguard />
+        <SiGnuprivacyguard className="!text-gray-300 hover:!text-white" />
       )
     : null,
   ,
   user && user?.user_type !== "admin"
     ? getItem(
         <Link to="/appointments" className="select-none">
-          My Appointment
+          {t("My Appointment")}
         </Link>,
         "2",
-        <GiArchiveRegister />
+        <GiArchiveRegister className="!text-gray-300 hover:!text-white" />
       )
     : null,
   getItem(
-    <span className="select-none">Doctors</span>,
-    "sub3",
-    <GiDoctorFace className="-ml-1" />,
+    <span className="text-gray-300 hover:text-white select-none">
+      {t("Doctors")}
+    </span>,
+    "subdoc3",
+    <GiDoctorFace className="-ml-1 !text-gray-300 hover:!text-white" />,
     [
       {
         ...getItem(
-          <div className="text-white font-medium select-none" specialty="all">
-            All Doctors
+          <div className="text-white font-semibold select-none" specialty="all">
+            {t("All Doctors")}
           </div>,
           "sub30"
         ),
@@ -529,7 +515,12 @@ const items = (
       },
       // ...subItems,
       {
-        ...getItem("Specialty", "sub31", null, subItems),
+        ...getItem(
+          <span className="font-medium text-white">{t("Specialty")}</span>,
+          "sub31",
+          null,
+          subItems(t)
+        ),
         onClick: (val) => toDoctors(val, navigate, DoctorRef),
       },
     ]
@@ -537,32 +528,32 @@ const items = (
   user
     ? getItem(
         <Link to="/chat" className="select-none">
-          Chating
+          {t("Chatting")}
         </Link>,
         "4",
-        <TiMessages />
+        <TiMessages className="!text-gray-300 hover:!text-white" />
       )
     : null,
   getItem(
     <Link to="/posts" className="select-none">
-      Questions
+      {t("Questions")}
     </Link>,
     "5",
-    <MdQuestionAnswer />
+    <MdQuestionAnswer className="!text-gray-300 hover:!text-white" />
   ),
   getItem(
     <Link to="/ratings" className="select-none">
-      Ratings
+      {t("Ratings")}
     </Link>,
     "6",
-    <FcRatings />
+    <FcRatings className="!text-gray-300 hover:!text-white" />
   ),
   getItem(
     <Link to="/feedbacks" className="select-none">
-      Feedbacks
+      {t("Feedbacks")}
     </Link>,
     "7",
-    <MdReviews />
+    <MdReviews className="!text-gray-300 hover:!text-white" />
   ),
 ];
 

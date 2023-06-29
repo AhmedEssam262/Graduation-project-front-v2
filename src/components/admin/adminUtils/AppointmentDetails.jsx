@@ -24,7 +24,7 @@ const AppointmentDetails = ({
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [showPop, setShowPop] = useState();
   useEffect(() => {
-    socket.emit("join_appointments", doctorId);
+    socket.emit("join_doctor", doctorId);
   }, []);
   useEffect(() => {
     const getSlots = (data) => {
@@ -104,7 +104,7 @@ const AppointmentDetails = ({
             <Empty
               className="flex flex-col"
               description={
-                <span className="font-medium text-white bg-gray-400 p-2 rounded-md">
+                <span className="font-medium text-white bg-gray-400 p-1 rounded-md">
                   No Appointments Scheduled
                 </span>
               }

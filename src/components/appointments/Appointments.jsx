@@ -8,7 +8,11 @@ import { cancelAppointment } from "../doctorDashboard/dashboardServices";
 import dayjs from "dayjs";
 import AppointmentTime from "./appointmentUtils/AppointmentTime";
 import { Link } from "react-router-dom";
-import { StopOutlined } from "@ant-design/icons";
+import {
+  StopOutlined,
+  VideoCameraFilled,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
 import { ImCancelCircle } from "react-icons/im";
 import PopUp from "../utils/PopUp";
 import {
@@ -24,6 +28,8 @@ import { BiMessageAltDetail } from "react-icons/bi";
 import { HiStatusOnline } from "react-icons/hi";
 import DoctorDetails from "./appointmentUtils/DoctorDetails";
 import AppointmentStart from "./appointmentUtils/AppointmentStart";
+import { useUtilsContext } from "../../contexts/UtilsContextProvider";
+import { useUserContext } from "../../contexts/UserContextProvider";
 const chkEmpty = (appointmentState, appointmentData) =>
   appointmentState == "total"
     ? false
@@ -50,14 +56,9 @@ const getAppointmentVal = (
     : appointment_state == "running"
     ? valRunning
     : valDefault;
-const Appointments = ({
-  user,
-  fetchUserData,
-  fromDash,
-  messageApi,
-  timeZone,
-  socket,
-}) => {
+const Appointments = ({ fromDash }) => {
+  const { messageApi, timeZone, socket } = useUtilsContext();
+  const { userData: user, fetchUserData } = useUserContext();
   const [selectedDate, setSelectedDate] = useState(() => ({
     count: 0,
     date: dayjs().format("YYYY-MM-DD"),
@@ -215,7 +216,7 @@ const Appointments = ({
                     // }}
                   >
                     <div
-                      className={`flex flex-wrap gap-1 p-2 bg-gray-300 rounded-lg border-1 border-white shadow-md`}
+                      className={`flex flex-wrap  gap-1.5 p-2 bg-gray-300 rounded-lg border-1 border-white shadow-md`}
                     >
                       <div
                         style={{
@@ -231,8 +232,8 @@ const Appointments = ({
                         "bg-blue-800/50"
                       )}`}
                       >
-                        <div className="grow">
-                          <div className="flex flex-wrap justify-between mb-2">
+                        <div className="grow flex h-full flex-wrap content-around">
+                          <div className="appointment--head--details flex flex-wrap w-full justify-between mb-2">
                             <div className="text-white bg-gray-700/50 rounded-lg w-fit p-1 font-medium flex gap-2 mb-2">
                               {getAppointmentVal(
                                 appointment_state,
@@ -254,6 +255,8 @@ const Appointments = ({
                                 <FaClinicMedical className="!flex items-center !text-gray-200 !text-xl" />
                               ) : appointment_type == "chat" ? (
                                 <BiMessageAltDetail className="!flex items-center !text-gray-200 !text-xl" />
+                              ) : appointment_type == "videoCall" ? (
+                                <VideoCameraOutlined className="!flex items-center !text-gray-200 !text-xl" />
                               ) : null}
                               <span className="font-medium">
                                 {appointment_type?.toUpperCase()}
@@ -289,27 +292,29 @@ const Appointments = ({
                               </div>
                             ) : null}
                           </div>
-                          <AppointmentTime
-                            appointmentId={appointment_id}
-                            appointment_duration={appointment_duration}
-                            date={selectedDate.date}
-                            patientId={patientId}
-                            schedule_date={schedule_date}
-                            doctorId={doctorId}
-                            slot_time={slot_time}
-                            appointment_state={appointment_state}
-                            appointmentData={appointmentData}
-                            getAppointmentVal={getAppointmentVal}
-                            fetchAppointmentData={fetchAppointmentData}
-                            order={i}
-                            timeZone={timeZone || ""}
-                            socket={socket}
-                          />
+                          <div className="w-full appointment--time">
+                            <AppointmentTime
+                              appointmentId={appointment_id}
+                              appointment_duration={appointment_duration}
+                              date={selectedDate.date}
+                              patientId={patientId}
+                              schedule_date={schedule_date}
+                              doctorId={doctorId}
+                              slot_time={slot_time}
+                              appointment_state={appointment_state}
+                              appointmentData={appointmentData}
+                              getAppointmentVal={getAppointmentVal}
+                              fetchAppointmentData={fetchAppointmentData}
+                              order={i}
+                              timeZone={timeZone || ""}
+                              socket={socket}
+                            />
+                          </div>
                         </div>
                       </div>
                       {appointment_state !== "free" && (
                         <>
-                          {appointment_state !== "booked" && (
+                          {appointment_state == "running" && (
                             <AppointmentStart
                               appointmentDetails={{
                                 withNickName:
@@ -321,6 +326,7 @@ const Appointments = ({
                                     ? patientId
                                     : doctorId,
                                 patientId,
+                                appointment_id,
                                 doctorId,
                                 appointment_state,
                                 appointment_type,

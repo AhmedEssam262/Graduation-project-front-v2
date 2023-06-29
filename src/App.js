@@ -28,15 +28,13 @@ import { useUserContext } from "./contexts/UserContextProvider";
 import Appointments from "./components/appointments/Appointments";
 import AppointmentContextProvider from "./contexts/AppointmentContextProvider";
 import Posts from "./components/posts/Posts";
-import io from "socket.io-client";
 import AppointmentPayment from "./components/bookAppointment/appointmentUtils/AppointmentPayment";
 import ServerError from "./components/utils/ServerError";
 import AdminDashboard from "./components/admin/AdminDashboard";
-import { ContextProvider } from "./components/admin/contexts/ContextProvider";
-import Transition from "./components/utils/transition/Transition";
-const socket = io.connect(`http://${window.location.hostname}:3000`);
+import OnlineMeeting from "./components/onlineMeeting/OnlineMeeting";
+import { useUtilsContext } from "./contexts/UtilsContextProvider";
+
 const cookies = new Cookies();
-const timeZone = " gmt+0300";
 const handleRoute = (element, permission, isLoading, isError) =>
   permission ? (
     element
@@ -51,33 +49,22 @@ const App = () => {
   const [navActive, setNavActive] = useState(true);
   const DoctorRef = useRef();
   const location = useLocation();
-  const {
-    userData,
-    isLoading,
-    isError,
-    tokenExpired,
-    fetchUserData,
-    setUserData,
-    messageApi,
-  } = useUserContext();
+  const { userData, isLoading, isError } = useUserContext();
+  const { lan } = useUtilsContext();
   // if (userData) window.localStorage.setItem("user", JSON.stringify(userData));
   const userAuth = userData;
+  console.log(userAuth);
   return (
-    <div className="app flex flex-col min-h-screen">
+    <div
+      className={`overflow-x-hidden //scroll--h app flex flex-col min-h-screen`}
+    >
       <div className="app--wrapper grow">
-        {navActive && (
-          <Navbar
-            messageApi={messageApi}
-            isUserLoading={isLoading}
-            DoctorRef={DoctorRef}
-            user={userAuth}
-            setUserData={setUserData}
-          />
-        )}
+        {navActive && <Navbar DoctorRef={DoctorRef} />}
         <div
           className="app--main flex flex-col grow"
           style={{
             backgroundColor: "#f5f5f5",
+            direction: lan == "ar" ? "rtl" : "",
           }}
         >
           <Routes>
@@ -85,12 +72,20 @@ const App = () => {
               path="/"
               element={
                 <HomeContextProvider>
-                  <HomePage
-                    user={userAuth}
-                    isUserLoading={isLoading}
-                    socket={socket}
-                  />
+                  <HomePage />
                 </HomeContextProvider>
+              }
+            />
+            <Route path="/join/meeting/:session" element={<OnlineMeeting />} />
+
+            <Route
+              path="/forbbiden"
+              element={
+                <ServerError
+                  statusTitle={"403"}
+                  status={403}
+                  message="Cannot access Resource Right now"
+                />
               }
             />
             <Route path="/error" element={<ServerError />} />
@@ -98,27 +93,15 @@ const App = () => {
               path="/doctors"
               element={
                 <DoctorsContextProvider noFirstRender>
-                  <Doctors
-                    socket={socket}
-                    user={userAuth}
-                    ref={DoctorRef}
-                    timeZone={timeZone}
-                  />
+                  <Doctors ref={DoctorRef} />
                 </DoctorsContextProvider>
               }
             />
             <Route
               path="/chat"
               element={handleRoute(
-                <ChatContextProvider fetchUserData={fetchUserData}>
-                  <Chat
-                    isChat={true}
-                    timeZone={timeZone}
-                    user={userAuth}
-                    fetchUserData={fetchUserData}
-                    messageApi={messageApi}
-                    socket={socket}
-                  />
+                <ChatContextProvider token={cookies.get("accessToken")}>
+                  <Chat isChat={true} />
                 </ChatContextProvider>,
                 userAuth,
                 isLoading,
@@ -129,13 +112,7 @@ const App = () => {
               path="/profile/:username"
               element={
                 <ProfileContextProvider>
-                  <UserProfile
-                    socket={socket}
-                    isUserLoading={isLoading}
-                    fetchUserData={fetchUserData}
-                    userid={userAuth?.user_id}
-                    timeZone={timeZone}
-                  />
+                  <UserProfile />
                 </ProfileContextProvider>
               }
             />
@@ -151,21 +128,12 @@ const App = () => {
               path="/posts"
               element={
                 <PostsContextProvider>
-                  <Posts socket={socket} />
+                  <Posts />
                 </PostsContextProvider>
               }
             />
-            <Route
-              path="/login"
-              element={
-                <Login
-                  user={userAuth}
-                  isTokenExpired={tokenExpired}
-                  fetchUserData={fetchUserData}
-                />
-              }
-            />
-            <Route path="/signup" element={<Signup user={userAuth} />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             <Route
               path="/appointment/payment"
               element={<AppointmentPayment />}
@@ -173,17 +141,8 @@ const App = () => {
             <Route
               path="/appointments"
               element={handleRoute(
-                <AppointmentContextProvider
-                  fetchUserData={fetchUserData}
-                  token={cookies.get("accessToken")}
-                >
-                  <Appointments
-                    messageApi={messageApi}
-                    timeZone={timeZone}
-                    fetchUserData={fetchUserData}
-                    user={userAuth}
-                    socket={socket}
-                  />
+                <AppointmentContextProvider token={cookies.get("accessToken")}>
+                  <Appointments />
                 </AppointmentContextProvider>,
                 userAuth && userAuth?.user_type !== "admin",
                 isLoading,
@@ -193,11 +152,7 @@ const App = () => {
             <Route
               path="/admin"
               element={handleRoute(
-                <AdminDashboard
-                  socket={socket}
-                  user={userAuth}
-                  timeZone={timeZone}
-                />,
+                <AdminDashboard />,
                 userAuth?.user_type == "admin",
                 isLoading,
                 isError
@@ -206,19 +161,8 @@ const App = () => {
             <Route
               path="/dashboard"
               element={handleRoute(
-                <DashboardContextProvider
-                  fetchUserData={fetchUserData}
-                  token={cookies.get("accessToken")}
-                >
-                  <DoctorDashboard
-                    setNavActive={setNavActive}
-                    messageApi={messageApi}
-                    isUserLoading={isLoading}
-                    user={userAuth}
-                    timeZone={timeZone}
-                    fetchUserData={fetchUserData}
-                    socket={socket}
-                  />
+                <DashboardContextProvider token={cookies.get("accessToken")}>
+                  <DoctorDashboard setNavActive={setNavActive} />
                 </DashboardContextProvider>,
                 userAuth?.user_type == "doctor",
                 isLoading,

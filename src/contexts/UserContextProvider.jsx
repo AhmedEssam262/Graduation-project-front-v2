@@ -24,8 +24,7 @@ const UserContextProvider = ({ children, token }) => {
   const host = window?.location?.hostname;
   const fetchUserData = async (active, directToken, directError, noRender) => {
     if (!noRender) setIsLoading(true);
-    if (!token && !active) {
-      console.log("reset");
+    if (!token && !directToken) {
       setUserData(null);
       return setIsLoading(false);
     }
@@ -108,8 +107,8 @@ const UserContextProvider = ({ children, token }) => {
         messageApi,
       }}
     >
-      {contextHolder}
       {children}
+      {contextHolder}
     </UserData.Provider>
   );
 };

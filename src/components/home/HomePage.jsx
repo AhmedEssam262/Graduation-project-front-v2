@@ -12,7 +12,6 @@ import {
 } from "antd";
 import { useMediaQuery } from "react-responsive";
 import { Link } from "react-router-dom";
-import Cryptocurrencies from "../user/doctors/Doctors";
 import Feedbacks from "./../feedback/Feedbacks";
 import Loader from "../Loader";
 import Doctors from "../user/doctors/Doctors";
@@ -20,7 +19,6 @@ import {
   PostsContextProvider,
   DoctorsContextProvider,
   FeedbackContextProvider,
-  SlotsContextProvider,
 } from "../../contexts";
 import Countup from "react-countup";
 import { useHomeContext } from "../../contexts/HomeContextProvider";
@@ -36,10 +34,23 @@ import { ImProfile } from "react-icons/im";
 import doctorIcon from "../../images/doctorIcon.jpg";
 import { FcStatistics } from "react-icons/fc";
 import { VscFeedback } from "react-icons/vsc";
-import Transition from "../utils/transition/Transition";
+import TransitionContent from "../utils/transition/TransitionContent";
+import { useUserContext } from "../../contexts/UserContextProvider";
+import { useUtilsContext } from "../../contexts/UtilsContextProvider";
+import LangItem from "../navbar/navbarUtils/LangItem";
+
 const { Title } = Typography;
-const TitleHeader = ({ icon, img, to, title, wrapperBg, contentBg }) =>
-  to ? (
+const TitleHeader = ({
+  icon,
+  img,
+  to,
+  title,
+  wrapperBg,
+  contentBg,
+  contClass = "",
+}) => {
+  const { t } = useUtilsContext();
+  return to ? (
     <Link
       to={`/${to}`}
       className={`
@@ -49,16 +60,21 @@ const TitleHeader = ({ icon, img, to, title, wrapperBg, contentBg }) =>
   }`}
     >
       <div
-        className={`text-xl grow w-full py-3 border-y
-border-white mb-2 text-center ${
+        className={`grow w-full py-3 border-y
+border-white mb-2 text-center ${contClass} ${
           contentBg ? contentBg : "!bg-blue-900/80 hover:!bg-blue-900"
         }`}
       >
-        <h1 className="text-4xl text-white text-center capitalize">{title}</h1>
+        <h1 className="break-all text-2xl sm:text-3xl xl:text-4xl text-white text-center capitalize">
+          {t(title)}
+        </h1>
         {icon ? (
           icon
         ) : img ? (
-          <Avatar src={img} className="!w-24 !h-24" />
+          <Avatar
+            src={img}
+            className="!w-12 !h-12 sm:!w-16 sm:!h-16 xl:!w-20 xl:!h-20"
+          />
         ) : null}
       </div>
     </Link>
@@ -72,24 +88,29 @@ border-white mb-2 text-center ${
     >
       <div
         className={`text-xl grow w-full py-3 border-y
-        border-white mb-2 text-center ${
+        border-white text-center ${contClass ? contClass : "mb-2"} ${
           contentBg ? contentBg : "bg-blue-900/80"
         }`}
       >
-        <h1 className="text-4xl text-white text-center capitalize">{title}</h1>
+        <h1 className="break-all text-2xl sm:text-3xl xl:text-4xl text-white text-center capitalize">
+          {t(title)}
+        </h1>
         {icon ? (
           icon
         ) : img ? (
-          <Avatar src={img} className="!w-24 !h-24" />
+          <Avatar
+            src={img}
+            className="!w-12 !h-12 sm:!w-16 sm:!h-16 xl:!w-20 xl:!h-20"
+          />
         ) : null}
       </div>
     </div>
   );
-const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
+};
+const HomePage = () => {
+  const { socket, timeZone, isMobile, lan, t, i18n } = useUtilsContext();
+  const { isLoading: isUserLoading, userData: user } = useUserContext();
   const { homeData, isLoading } = useHomeContext();
-  const isMobile = useMediaQuery({
-    query: "(max-width:778px)",
-  });
   const globalStats = homeData;
   const HomeData = [
     {
@@ -104,7 +125,7 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
       isLine: true,
       noLine: "sm",
       title: "Average Rating",
-      value: globalStats?.avgRate,
+      value: globalStats?.avgRate || 0,
       prefix: (
         <Rate
           disabled
@@ -149,10 +170,15 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
         }}
       >
         {!isUserLoading ? (
-          <Transition>
-            <div className="mb-8">
+          <TransitionContent id="home--hero">
+            <div
+              style={{
+                direction: lan == "ar" ? "ltr" : "",
+              }}
+              className="mb-8 sm:mx-6"
+            >
               <h1
-                className="mt-10 text-gray-100 shadow-lg  p-2 sm:p-4 sm:py-6
+                className="mt-10 text-gray-100 shadow-lg py-6 sm:py-8 xl:py-10
           rounded-lg text-xl sm:text-4xl ml-auto mr-auto"
                 style={{
                   fontFamily: "cursive",
@@ -160,7 +186,7 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
                     "linear-gradient(to right, #194d84, #34659b, #407dbf)",
                 }}
               >
-                Online Clinic
+                {t("Online Clinic")}
               </h1>
               {user && (
                 <div className="!flex gap-8 mt-2 !justify-center px-2">
@@ -184,11 +210,13 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
                         ) : (
                           <MdDashboard className="mb-2 flex justify-center items-center w-full !text-lg sm:!text-2xl" />
                         )}
-                        {user?.user_type == "user"
-                          ? `My Profile`
-                          : user?.user_type == "admin"
-                          ? `My Admin Dashboard`
-                          : `My Doctor Dashboard`}
+                        {t(
+                          user?.user_type == "user"
+                            ? `My Profile`
+                            : user?.user_type == "admin"
+                            ? `My Admin Dashboard`
+                            : `My Doctor Dashboard`
+                        )}
                       </Link>
                     </div>
                   </div>
@@ -208,7 +236,7 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
                         to="/chat"
                       >
                         <BsFillChatSquareTextFill className="mb-2 flex justify-center items-center w-full !text-lg sm:!text-2xl" />
-                        Chatting
+                        {t("Chatting")}
                       </Link>
                     </div>
                   </div>
@@ -221,7 +249,7 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
                           to="/appointments"
                         >
                           <AiOutlineSchedule className="mb-2 flex justify-center items-center w-full !text-lg sm:!text-2xl" />
-                          Your Appointments
+                          {t("Your Appointments")}
                         </Link>
                       </div>
                     </div>
@@ -237,7 +265,7 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
                       to="/doctors"
                     >
                       <GiDoctorFace className="mb-2 flex justify-center items-center w-full !text-lg sm:!text-2xl" />
-                      Doctors
+                      {t("Doctors")}
                     </Link>
                   </div>
                 </div>
@@ -249,13 +277,13 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
                       to="/posts"
                     >
                       <RiQuestionAnswerLine className="mb-2 flex justify-center items-center w-full !text-lg sm:!text-2xl" />
-                      Questions
+                      {t("Questions")}
                     </Link>
                   </div>
                 </div>
               </div>
             </div>
-          </Transition>
+          </TransitionContent>
         ) : (
           <div className="mt-10">
             <Skeleton.Button className="!w-full" active size={90} />
@@ -287,19 +315,18 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
             }}
           />
         </div> */}
+        <TitleHeader
+          wrapperBg={"no"}
+          contentBg={"bg-blue-900/90"}
+          title="Statistics"
+          icon={
+            <FcStatistics className="text-3xl sm:text-5xl xl:text-6xl !m-auto" />
+          }
+        />
         {isLoading ? (
           <Loader />
         ) : (
-          <>
-            {/* <Title className="!text-lg sm:!text-3xl home--header">
-            Online Clinic Statistics
-          </Title> */}
-            <TitleHeader
-              wrapperBg={"no"}
-              contentBg={"bg-blue-900/90"}
-              title="statistics"
-              icon={<FcStatistics className="w-16 h-16 !m-auto" />}
-            />
+          <TransitionContent key="statistics" speed="medium">
             <Row
               className="text-center bg-gray-200/30 shadow-md"
               style={{ marginBottom: "15px", marginInline: "10px" }}
@@ -336,7 +363,7 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
                         <Statistic
                           title={
                             <span className="text-gray-500 font-medium text-sm sm:text-lg">
-                              {title}
+                              {t(title)}
                             </span>
                           }
                           className="statistics--name"
@@ -367,13 +394,13 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
                 }
               )}
             </Row>
-          </>
+          </TransitionContent>
         )}
         <div className="showmore--container">
           <TitleHeader
             wrapperBg={"no"}
             to="doctors"
-            title="doctors"
+            title="Doctors"
             img={doctorIcon}
           />
           {/* <div className="showmore--doctors">
@@ -390,14 +417,8 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
             <Link to="/doctors">Show More</Link>
           </Title>
         </div> */}
-          <DoctorsContextProvider query={{ limit: 7 }}>
-            <Doctors
-              home
-              isMobile={isMobile}
-              timeZone={timeZone}
-              user={user}
-              socket={socket}
-            />
+          <DoctorsContextProvider query={{ limit: 5 }}>
+            <Doctors home />
           </DoctorsContextProvider>
           {/* <div className="showmore--reviews">
           <Title
@@ -416,8 +437,10 @@ const HomePage = ({ socket, user, timeZone, isUserLoading }) => {
           <TitleHeader
             wrapperBg={"no"}
             to="feedbacks"
-            title="feedbacks"
-            icon={<VscFeedback className="!text-white w-16 h-16 !m-auto" />}
+            title="Feedbacks"
+            icon={
+              <VscFeedback className="!text-white text-3xl sm:text-5xl xl:text-6xl !m-auto" />
+            }
           />
           <FeedbackContextProvider
             contextQuery={{

@@ -13,7 +13,9 @@ const submitLike = async (
   lenViewedComments,
   getLike,
   setLikeData,
-  socket
+  socket,
+  setPosts,
+  setComments
 ) => {
   const data = { postId, commentId: commentId || null, likeType, isPost };
   const host = window?.location?.hostname;
@@ -33,14 +35,56 @@ const submitLike = async (
     .then((res) => {
       // getLike(setLikeData, postId, commentId);
       setLikeData(res?.data?.data);
-      // if (!isPost)
-      //   fetchCommentsData(
-      //     {
-      //       postId,
-      //       limit: lenViewedComments,
-      //     },
-      //     true
-      //   );
+      const { like_emoji, dislike, angry } = res?.data?.data;
+      if (!isPost) {
+        // fetchCommentsData(
+        //   {
+        //     postId,
+        //     limit: lenViewedComments,
+        //   },
+        //   true
+        // );
+        socket?.emit("send_comment", {
+          post_id: postId,
+          comment_id: commentId,
+          like_emoji,
+          dislike,
+          angry,
+          updateEmoji: true,
+        });
+        setComments((comments) =>
+          comments?.map((c) =>
+            c?.comment_id == commentId
+              ? {
+                  ...c,
+                  like_emoji: like_emoji || 0,
+                  dislike: dislike || 0,
+                  angry: angry || 0,
+                }
+              : c
+          )
+        );
+      } else {
+        socket?.emit("send_post", {
+          post_id: postId,
+          like_emoji,
+          dislike,
+          angry,
+          updateEmoji: true,
+        });
+        setPosts((posts) =>
+          posts?.map((post) =>
+            post?.post_id == postId
+              ? {
+                  ...post,
+                  like_emoji: like_emoji || 0,
+                  dislike: dislike || 0,
+                  angry: angry || 0,
+                }
+              : post
+          )
+        );
+      }
     })
     .catch((err) => {
       console.log(err);

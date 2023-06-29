@@ -13,11 +13,13 @@ import Chat from "../chat/Chat";
 import { useUserContext } from "../../contexts/UserContextProvider";
 import UserProfile from "../user/profile/UserProfile";
 import UserManagment from "./adminUtils/UserManagment";
-const AdminDashboard = ({ timeZone, user, socket }) => {
+import { useUtilsContext } from "../../contexts/UtilsContextProvider";
+const AdminDashboard = () => {
   const isMobile = useMediaQuery({
     query: "(max-width:878px)",
   });
-  const { fetchUserData, isLoading, messageApi } = useUserContext();
+  const { timeZone, userData: user, socket, messageApi } = useUtilsContext();
+  const { fetchUserData, isLoading } = useUserContext();
   const [activeMenu, setActiveMenu] = useState(false);
   const [dashType, setDashType] = useState(
     window.localStorage.getItem("adminDashType")

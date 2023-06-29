@@ -12,6 +12,7 @@ import SuccessAppointment from "../../../bookAppointment/appointmentUtils/Succes
 import bookAppointment from "../../../bookAppointment/appointmentServices/bookAppointment";
 import PopUp from "../../../utils/PopUp";
 import { useUserContext } from "../../../../contexts/UserContextProvider";
+import { useUtilsContext } from "../../../../contexts/UtilsContextProvider";
 const BookCard = ({ doctorId, socket, timeZone, isPayment, setIsPayment }) => {
   const { slotsData, isLoading, fetchSlotsData } = useSlotsContext();
   const { messageApi, fetchUserData, userData } = useUserContext();
@@ -22,7 +23,7 @@ const BookCard = ({ doctorId, socket, timeZone, isPayment, setIsPayment }) => {
   const [bookedAppointment, setBookedAppointment] = useState();
   const navigate = useNavigate();
   useEffect(() => {
-    socket?.emit("join_appointments", doctorId);
+    socket?.emit("join_doctor", doctorId);
   }, []);
   useEffect(() => {
     const fetchSlots = (data) => {
@@ -75,7 +76,7 @@ const BookCard = ({ doctorId, socket, timeZone, isPayment, setIsPayment }) => {
           e.stopPropagation();
           e.preventDefault();
         }}
-        className="doctor--slots sm:w-1/3 xl:w-2/5 flex flex-col mr-2 shadow-lg rounded bg-gray-200"
+        className={`doctor--slots sm:w-1/3 xl:w-2/5 flex flex-col shadow-lg rounded bg-gray-200`}
       >
         <DatePicker
           selectedDate={selectedDate}

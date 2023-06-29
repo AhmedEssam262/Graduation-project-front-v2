@@ -3,22 +3,17 @@ import { Button, Typography, Menu, Avatar, Select } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import clinicLogo from "../../images/clinic.png";
 import { useMediaQuery } from "react-responsive";
-import {
-  TbLayoutSidebarRightCollapse,
-  TbLayoutSidebarLeftCollapse,
-} from "react-icons/tb";
 import { MenuOutlined } from "@ant-design/icons";
-import { SignBanner } from "..";
 import items from "./navbarUtils/navItems.jsx";
 import { FaEllipsisV } from "react-icons/fa";
+import { useUtilsContext } from "../../contexts/UtilsContextProvider";
+import { useUserContext } from "../../contexts/UserContextProvider";
+import LangItem from "./navbarUtils/LangItem";
+
 const { Title, Item } = { ...Typography, ...Menu };
-const Navbar = ({
-  user,
-  setUserData,
-  DoctorRef,
-  isUserLoading,
-  messageApi,
-}) => {
+const Navbar = ({ DoctorRef }) => {
+  const { messageApi, lan, t } = useUtilsContext();
+  const { setUserData, userData: user } = useUserContext();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({
     query: "(max-width:678px)",
@@ -67,31 +62,36 @@ const Navbar = ({
           minWidth: isMobile ? undefined : "290px",
           maxWidth: isMobile ? undefined : "290px",
           boxShadow: "inset -1px 0px white",
-          backgroundColor: !isMobile ? "rgb(8 14 20)" : "",
+          // backgroundColor: !isMobile ? "rgb(8 14 20)" : "",
+          backgroundColor: "rgb(20, 57, 94)",
         }}
       >
         {!isMobile ? (
           <>
-            <div
+            {/* <div
               className="icon--mask"
               style={{
-                backgroundColor: "rgb(6 16 20)",
-                width: "2px",
-                top: "50%",
+                // backgroundColor: "rgb(6 16 20)",
+                backgroundColor: "white",
+                width: "1px",
+                top: "5%",
                 height: "50px",
-                left: "calc(100% - 2px)",
+                left: "calc(100% - 1px)",
               }}
-            ></div>
+            ></div> */}
             <div
               className="show--navbar items-center justify-end flex
-          -z-10 absolute top-1/2 cursor-pointer"
+          -z-10 absolute cursor-pointer"
               style={{
-                backgroundColor: "rgb(6 16 20)",
-                width: "50px",
-                height: "50px",
+                // backgroundColor: "rgb(6 16 20)",
+                backgroundColor: "rgb(20 57 94)",
+                width: "45px",
+                height: "45px",
+                top: "5%",
                 /* border: 12px transparent solid; */
-                left: "calc(100% - 25px)",
-                borderRadius: "50%",
+                left: "calc(100% - 15px)",
+                borderTopRightRadius: "50%",
+                borderBottomRightRadius: "50%",
               }}
               onClick={() => {
                 setNavWidth((width) =>
@@ -99,7 +99,7 @@ const Navbar = ({
                 );
               }}
             >
-              <FaEllipsisV className="!text-gray-100 !text-2xl" />
+              <FaEllipsisV className="!text-gray-100 !text-2xl mr-1" />
               {/* {navWidth != 0 ? (
             <TbLayoutSidebarRightCollapse
             size={50}
@@ -150,8 +150,8 @@ const Navbar = ({
         <div
           className={
             isMobile
-              ? `w-full flex items-center
-      justify-center flex-wrap`
+              ? `mx-1 w-full flex items-center
+      justify-between flex-wrap gap-2`
               : "text-center"
           }
         >
@@ -169,13 +169,14 @@ const Navbar = ({
                 isMobile ? "!text-gray-100" : "!text-blue-100"
               }`}
             >
-              Online Clinic
+              {t("Online Clinic")}
             </Title>
           </Link>
+          <LangItem isMobile={isMobile} />
           {isMobile ? (
             <Button
               onClick={toggle}
-              className="menu--button
+              className="menu--button grow
           !h-10 !flex  justify-center items-center"
             >
               <MenuOutlined />
@@ -186,7 +187,9 @@ const Navbar = ({
           ref={menuElement}
           theme="dark"
           mode={!isMobile ? "inline" : "vertical"}
-          className={`navbar--menu ${isMobile ? "top-full absolute" : ""}`}
+          className={`navbar--menu ${isMobile ? "sm" : ""} ${
+            lan == "ar" ? "ar--nav" : ""
+          } ${isMobile ? "top-full absolute" : ""}`}
           style={{
             paddingInline: "5px",
             height: `
@@ -200,10 +203,13 @@ const Navbar = ({
             transition:
               "background 0.3s, width 0.3s cubic-bezier(0.2, 0, 0, 1) 0s,height 0.5s ease",
             fontSize: "medium",
-            backgroundColor: !isMobile ? "rgb(8 14 20)" : "",
+            // backgroundColor:"#285885",
+            backgroundColor: "rgb(20, 57, 94)",
+            // backgroundColor: !isMobile ? "rgb(8 14 20)" : "",
             boxShadow: "inset -1px 0px white",
           }}
           items={items(
+            t,
             navigate,
             location,
             DoctorRef,

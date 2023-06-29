@@ -58,7 +58,9 @@ const Navbar = ({
       style={{
         height: "61.5px",
       }}
-      className="flex justify-between border-b-2 !bg-white shadow-md border-gray-700/50 p-2 xl:ml-6 xl:mr-6 relative"
+      className={`flex justify-between border-b-2 !bg-white shadow-md border-gray-700/50 p-2 ${
+        dashType == "chat" ? "" : "xl:mx-6"
+      } relative`}
     >
       <NavButton
         title="Menu"

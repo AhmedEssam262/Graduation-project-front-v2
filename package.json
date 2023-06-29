@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/preset-env": "^7.22.5",
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
     "@reduxjs/toolkit": "^1.8.5",
@@ -14,17 +16,23 @@
     "@testing-library/user-event": "^13.5.0",
     "antd": "^5.1.6",
     "axios": "^1.2.5",
+    "babel-jest": "^29.5.0",
     "dayjs": "^1.11.7",
     "emoji-picker-react": "^4.4.8",
+    "i18next": "^23.2.3",
+    "i18next-browser-languagedetector": "^7.0.2",
+    "i18next-http-backend": "^2.2.1",
     "jwt-decode": "^3.1.2",
     "millify": "^5.0.1",
     "moment": "^2.29.4",
+    "openvidu-browser": "^2.27.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-countdown": "^2.3.5",
     "react-countup": "^6.4.1",
     "react-device-detect": "^2.2.3",
     "react-dom": "^18.2.0",
+    "react-i18next": "^13.0.1",
     "react-icons": "^4.7.1",
     "react-loading-skeleton": "^3.3.1",
     "react-redux": "^8.0.2",
@@ -41,6 +49,11 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "axios": "axios/dist/node/axios.cjs"
+    }
   },
   "eslintConfig": {
     "extends": [

@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "universal-cookie";
+import { useUserContext } from "./UserContextProvider";
 const handleQuery = (obj) =>
   !obj
     ? ""
@@ -19,9 +20,10 @@ const handleQuery = (obj) =>
         )
         .join("&");
 const ChatData = createContext(null);
-const ChatContextProvider = ({ children, token, fetchUserData }) => {
+const ChatContextProvider = ({ children, token }) => {
+  const { fetchUserData } = useUserContext();
   const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(true);
+  const [isError, setIsError] = useState(false);
   const [chatData, setChatData] = useState(null);
   const host = window?.location?.hostname;
   const fetchChatData = async (active, directToken, query, noWaiting) => {

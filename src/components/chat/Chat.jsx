@@ -18,16 +18,14 @@ import userPhoto from "../../images/userPhoto.png";
 import doctorPhoto from "../../images/doctorPhoto.png";
 import { Link } from "react-router-dom";
 import { AiOutlineArrowLeft, AiOutlineArrowUp } from "react-icons/ai";
+import ServerError from "../utils/ServerError";
+import { MdError } from "react-icons/md";
+import { useUserContext } from "../../contexts/UserContextProvider";
+import { useUtilsContext } from "../../contexts/UtilsContextProvider";
 
-const Chat = ({
-  isAdmin,
-  isChat,
-  fetchUserData,
-  user,
-  messageApi,
-  socket,
-  timeZone,
-}) => {
+const Chat = ({ isAdmin, isChat }) => {
+  const { messageApi, socket, timeZone } = useUtilsContext();
+  const { fetchUserData, userData: user } = useUserContext();
   const { fetchChatData, chatData, isLoading, isError } = useChatContext();
   const isMobile = useMediaQuery({
     query: "(max-width:678px)",
@@ -74,8 +72,25 @@ const Chat = ({
       }}
       className={`flex ${isMobile && "flex-col"}`}
     >
-      {
-        // chatData?.length ?
+      {isError ? (
+        <div className="p-1 flex flex-col bg-red-500/70 justify-evenly items-center">
+          <span className="text-white font-medium text-xl sm:text-2xl lg:text-3xl">
+            No Users
+          </span>
+          <MdError
+            fill="white"
+            style={{
+              fontSize: isMobile ? "125px" : "150px",
+            }}
+          />
+          <Link
+            to="/chat"
+            className="p-3 sm:p-4 text-xl sm:mx-2 sm:text-3xl rounded-lg !text-white bg-blue-800/70 hover:bg-blue-800/90 rounded"
+          >
+            Refresh Now
+          </Link>
+        </div>
+      ) : (
         <Cards
           isLoading={isLoading}
           withUser={withUser}
@@ -85,22 +100,8 @@ const Chat = ({
           me={me}
           userId={user?.user_id}
         />
-        // : isLoading ? (
-        // <Loader />
-        // ) :
-        // (
-        //   <Empty
-        //     className="!flex !flex-col !justify-center !items-center"
-        //     description={
-        //       <span className="text-gray-700 font-medium">
-        //         There's no Users exist
-        //       </span>
-        //     }
-        //   />
-        // )
-        // null
-      }
-      {withUser ? (
+      )}
+      {chatRecord || isLoading ? (
         <div
           style={{
             height: !isMobile ? "100%" : "calc(100% - 83.7px)",
@@ -144,7 +145,10 @@ const Chat = ({
               isOpen={
                 user?.user_type == "user" && withUser !== user?.user_id
                   ? chatRecord?.is_open == 1
-                  : chatRecord?.is_open != 0
+                  : !chatRecord?.is_open ||
+                    ((chatRecord?.user_type == "user" ||
+                      user?.user_type == "admin") &&
+                      chatRecord?.chat_from)
               }
               withNickName={chatRecord?.nick_name}
               socket={socket}

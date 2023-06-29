@@ -51,11 +51,9 @@ const ScheduleAppointments = ({
       : dayjs()
   );
   const navigate = useNavigate();
-  const isVerified = true;
-
-  //const isVerified = doctorData?.is_verified;
+  const isVerified = doctorData?.is_verified;
   useEffect(() => {
-    if (userid) socket.emit("join_appointments", userid);
+    if (userid) socket.emit("join_doctor", userid);
   }, []);
   useEffect(() => {
     const getSlots = (data) => {

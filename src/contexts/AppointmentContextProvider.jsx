@@ -9,15 +9,11 @@ import {
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "universal-cookie";
+import { useUserContext } from "./UserContextProvider";
 
 const AppointmentData = createContext(null);
-const AppointmentContextProvider = ({
-  children,
-  token,
-  fetchUserData,
-  isDoctor,
-  messageApi,
-}) => {
+const AppointmentContextProvider = ({ children, token, isDoctor }) => {
+  const { fetchUserData } = useUserContext();
   const [isLoading, setIsLoading] = useState(true);
   const [appointmentData, setAppointmentData] = useState(null);
   const host = window?.location?.hostname;
@@ -114,7 +110,6 @@ const AppointmentContextProvider = ({
         appointmentData,
         fetchAppointmentData,
         setAppointmentData,
-        messageApi,
       }}
     >
       {children}

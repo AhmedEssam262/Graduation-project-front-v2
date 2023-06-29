@@ -21,7 +21,7 @@ const bookAppointment = (
   if (appointmentId) {
     const data = {
       data: {
-        date: selectedDate?.format("YYYY-MM-DD"),
+        date: selectedDate,
         appointmentId,
         bookedSlot,
         doctorId: profileId,
@@ -58,14 +58,14 @@ const bookAppointment = (
         // });
         fetchSlotsData(
           {
-            date: selectedDate?.format("YYYY-MM-DD"),
+            date: selectedDate,
             doctorId: profileId,
           },
           true
         );
         if (!isCheck) {
           socket.emit("update_appointments", {
-            date: selectedDate?.format("YYYY-MM-DD"),
+            date: selectedDate,
             doctorId: profileId,
             appointmentId,
           });
@@ -98,7 +98,7 @@ const bookAppointment = (
             });
             fetchSlotsData(
               {
-                date: selectedDate?.format("YYYY-MM-DD"),
+                date: selectedDate,
                 doctorId: profileId,
               },
               true
@@ -114,7 +114,7 @@ const bookAppointment = (
             });
             fetchSlotsData(
               {
-                date: selectedDate?.format("YYYY-MM-DD"),
+                date: selectedDate,
                 doctorId: profileId,
               },
               true

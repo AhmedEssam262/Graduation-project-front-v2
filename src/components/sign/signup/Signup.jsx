@@ -26,6 +26,8 @@ import { useNavigate } from "react-router-dom";
 import UserType from "./signupUtils/UserType";
 import HeaderLine from "./signupUtils/HeaderLine";
 import { cityOption } from "./signupUtils/signData";
+import { useUtilsContext } from "../../../contexts/UtilsContextProvider";
+import { useUserContext } from "../../../contexts/UserContextProvider";
 const { Option } = Select;
 
 const getMessage = (key, type, content, duration) => ({
@@ -43,7 +45,8 @@ const beforeUpload = (file) => {
       file.type === "image/jpeg" ||
       file.type === "image/jpg" ||
       file.type === "image/png" ||
-      file.type === "image/gif";
+      file.type === "image/gif" ||
+      file.type === "image/webp";
     const isLt5M = file.size / 1024 / 1024 <= 5;
     if (!isImg) {
       message.error("You can only upload images", 4);
@@ -83,7 +86,8 @@ const checkUserName = (uname, setValidState) => {
   axios
     .get(`http://127.0.0.1:8000/api/chkuname/${uname}`)
     .then(() => {
-      if (uname) setValidState("success"); // new user name
+      if (uname) setValidState("success");
+      // new user name
       else setValidState(""); // empty field
     })
     .catch((err) => {
@@ -94,7 +98,9 @@ const checkUserName = (uname, setValidState) => {
     });
 };
 
-function Signup({ user }) {
+function Signup() {
+  const { messageApi, t } = useUtilsContext();
+  const { userData: user } = useUserContext();
   const { Item } = Form;
   const isMobile = useMediaQuery({
     query: "(max-width:778px)",
@@ -104,7 +110,6 @@ function Signup({ user }) {
     prefix: "20",
   });
   const [imageUrls, setImageUrls] = useState([]);
-  const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -126,7 +131,6 @@ function Signup({ user }) {
       values.birth = values?.birth?.format("YYYY-MM-DD");
       values.images = imageUrls?.[0];
       values.moreInf = formValues.moreInf;
-      console.log(values);
       const host = window?.location?.hostname;
       axios
         .post(
@@ -143,7 +147,7 @@ function Signup({ user }) {
             getMessage(
               1,
               "success",
-              `${values?.username} added you can login now`,
+              `${values?.username} ${t("added you can login now")}`,
               2
             )
           );
@@ -158,7 +162,9 @@ function Signup({ user }) {
               getMessage(
                 1,
                 "error",
-                `${values?.username} already exist, please write new username`,
+                `${values?.username} ${t(
+                  "already exist, please write new username"
+                )}`,
                 2
               )
             );
@@ -168,7 +174,7 @@ function Signup({ user }) {
               getMessage(
                 1,
                 "error",
-                `there's some issues, please try again later`,
+                `${t("there's some issues, please try again later")}`,
                 2
               )
             );
@@ -191,7 +197,10 @@ function Signup({ user }) {
       className="form--up--wrapper grow
     p-2 sm:p-10 flex justify-center"
       style={{
-        background: "linear-gradient(225deg, rgb(32 58 89 / 90%), #a1858bff)",
+        background:
+          "linear-gradient(to right top,rgb(93 98 128 / 85%) , rgb(108 146 192 / 90%))",
+        // "linear-gradient(to right top, rgba(32, 58, 89, 0.9), #334297d9)",
+        // background: "linear-gradient(225deg, rgb(32 58 89 / 90%), #a1858bff)",
       }}
     >
       <Form
@@ -205,21 +214,20 @@ function Signup({ user }) {
         onFinish={addUser}
         scrollToFirstError
       >
-        {contextHolder}
         <HeaderLine
-          value="SignUp"
+          value={t("SignUp")}
           center
           invisible
           size="no"
           classText="text-4xl sm:text-5xl xl:text-6xl"
           style={{ color: "white", marginBottom: "65px" }}
         />
-        <HeaderLine value="Required Informations" />
+        <HeaderLine value={t("Required Informations")} />
         <div className="flex flex-wrap gap-1">
           <div className="grow sm:w-1/3 w-full">
             <HeaderLine
               imp
-              value="nickname"
+              value={t("nickname")}
               size={"sm"}
               font="medium"
               classLine={"w-1/2 border-1 mb-2"}
@@ -229,17 +237,17 @@ function Signup({ user }) {
               rules={[
                 {
                   required: true,
-                  message: "Please write your nickname!",
+                  message: `${t("Please write your nickname!")}`,
                 },
               ]}
             >
-              <Input placeholder="nickname" />
+              <Input placeholder={t("nickname")} />
             </Item>
           </div>
           <div className="grow sm:w-1/3 w-full">
             <HeaderLine
               imp
-              value="username"
+              value={t("username")}
               size={"sm"}
               font="medium"
               classLine={"w-1/2 border-1 mb-2"}
@@ -258,15 +266,17 @@ function Signup({ user }) {
               rules={[
                 {
                   required: true,
-                  message: "Please input your username!",
+                  message: `${t("Please input your username!")}`,
                 },
                 {
                   pattern: "^([A-Z]|[a-z])+.{0,22}$",
-                  message: "must begin with letters and max 22 character",
+                  message: `${t(
+                    "must begin with letters and max 22 character"
+                  )}`,
                 },
               ]}
             >
-              <Input prefix={<UserOutlined />} placeholder="username" />
+              <Input prefix={<UserOutlined />} placeholder={t("username")} />
             </Item>
           </div>
         </div>
@@ -277,18 +287,19 @@ function Signup({ user }) {
               rules={[
                 {
                   required: true,
-                  message: "Please input your password!",
+                  message: `${t("Please input your password!")}`,
                 },
                 {
-                  message: `Minimum 8 and maximum 14 characters, at least 
-                one uppercase letter, one lowercase letter  `,
+                  message: `${t(
+                    "Minimum 8 and maximum 14 characters, at least one uppercase letter, one lowercase letter"
+                  )}  `,
                   pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,14}$",
                 },
               ]}
             >
               <Input.Password
                 prefix={<LockOutlined />}
-                placeholder="Password"
+                placeholder={t("Password")}
               />
             </Item>
           </div>
@@ -299,7 +310,7 @@ function Signup({ user }) {
               rules={[
                 {
                   required: true,
-                  message: "Please confirm your password!",
+                  message: `${t("Please confirm your password!")}`,
                 },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
@@ -315,25 +326,27 @@ function Signup({ user }) {
                 }),
               ]}
             >
-              <Input.Password placeholder="Confirm Password" />
+              <Input.Password placeholder={t("Confirm Password")} />
             </Form.Item>
           </div>
         </div>
-        <HeaderLine value="Privacy Informations" />
+        <HeaderLine value={t("Privacy Informations")} />
         <div className="flex items-end gap-1 justify-between flex-wrap">
           <div className="grow">
             <HeaderLine
               imp
-              value="Gender"
+              value={t("Gender")}
               size={"sm"}
               font="medium"
               classLine={"w-1/2 border-1 mb-2"}
             />
             <Item
               name="gender"
-              rules={[{ required: true, message: "Please select gender!" }]}
+              rules={[
+                { required: true, message: `${t("Please select gender!")}` },
+              ]}
             >
-              <Select placeholder="Select your gender">
+              <Select placeholder={t("Select your gender")}>
                 <Option value="male">Male</Option>
                 <Option value="female">Female</Option>
               </Select>
@@ -345,10 +358,10 @@ function Signup({ user }) {
               rules={[
                 {
                   required: true,
-                  message: "you enter your birthdate",
+                  message: `${t("you enter your birthdate")}`,
                 },
                 {
-                  message: "your age must be more than 13",
+                  message: `${t("your age must be more than 13")}`,
                   validator(_, value) {
                     if (new Date().getFullYear() - value?.year() < 13)
                       return Promise.reject();
@@ -357,14 +370,17 @@ function Signup({ user }) {
                 },
               ]}
             >
-              <DatePicker style={{ width: "100%" }} placeholder="birthdate" />
+              <DatePicker
+                style={{ width: "100%" }}
+                placeholder={t("birthdate")}
+              />
             </Item>
           </div>
         </div>
         <div>
           <HeaderLine
             imp
-            value="Address"
+            value={t("Address")}
             size={"sm"}
             font="medium"
             classLine={"w-1/2 border-1 mb-2"}
@@ -379,11 +395,11 @@ function Signup({ user }) {
                     rules={[
                       {
                         required: true,
-                        message: "city is required",
+                        message: `${t("city is required")}`,
                       },
                     ]}
                   >
-                    <Select placeholder="Select city" showSearch>
+                    <Select placeholder={t("Select city")} showSearch>
                       {cityOption}
                     </Select>
                   </Item>
@@ -394,12 +410,12 @@ function Signup({ user }) {
                   rules={[
                     {
                       required: true,
-                      message: "Street is required",
+                      message: `${t("Street is required")}`,
                     },
                   ]}
                   className="!grow"
                 >
-                  <Input placeholder="Your street" />
+                  <Input placeholder={t("Your street")} />
                 </Item>
               </div>
             </Input.Group>
@@ -412,7 +428,7 @@ function Signup({ user }) {
               rules={[
                 {
                   required: true,
-                  message: "Please write your phone number!",
+                  message: `${t("Please write your phone number!")}`,
                 },
                 {
                   message:
@@ -422,7 +438,7 @@ function Signup({ user }) {
               ]}
             >
               <Input
-                placeholder="Your phone number"
+                placeholder={t("Your phone number")}
                 addonBefore={prefixSelector}
               />
             </Item>
@@ -433,15 +449,15 @@ function Signup({ user }) {
               rules={[
                 {
                   required: true,
-                  message: "you must write your email!",
+                  message: `${t("you must write your email!")}`,
                 },
                 {
                   type: "email",
-                  message: "write correct email please!!",
+                  message: `${t("write correct email please!!")}`,
                 },
               ]}
             >
-              <Input prefix={<MailOutlined />} placeholder="Your email" />
+              <Input prefix={<MailOutlined />} placeholder={t("Your email")} />
             </Item>
           </div>
         </div>
@@ -456,7 +472,7 @@ function Signup({ user }) {
               name="file"
               beforeUpload={beforeUpload}
               //onChange={handleChange}
-              accept=".png, .jpg, .jpeg, .bpm"
+              accept=".png, .jpg, .jpeg, .bpm, .webp"
               listType="picture"
               multiple={false}
               maxCount={5}
@@ -476,7 +492,7 @@ function Signup({ user }) {
           rules={[
             {
               required: true,
-              message: "you must choose between staff or user",
+              message: `${t("you must choose between staff or user")}`,
             },
           ]}
         >
@@ -488,7 +504,7 @@ function Signup({ user }) {
               `}
               value="user"
             >
-              user
+              {t("user")}
             </Radio.Button>
             <Radio.Button
               className={`!ml-1 !hover:bg-gray-200 !border-2 
@@ -497,7 +513,7 @@ function Signup({ user }) {
               `}
               value="doctor"
             >
-              doctor
+              {t("doctor")}
             </Radio.Button>
           </Radio.Group>
         </Item>
@@ -510,9 +526,9 @@ function Signup({ user }) {
           <Button
             type="primary"
             htmlType="submit"
-            className="w-full !border !border-white"
+            className="w-full !border !border-white  !bg-blue-600/80 hover:!bg-blue-600"
           >
-            Submit
+            {t("Submit")}
           </Button>
         </Item>
       </Form>

@@ -1,5 +1,4 @@
 import { Button, Input, Select } from "antd";
-import { Typography } from "antd";
 import React, {
   forwardRef,
   useEffect,
@@ -10,15 +9,12 @@ import React, {
 } from "react";
 import HeaderLine from "../../../sign/signup/signupUtils/HeaderLine";
 import { DoctorOptions } from "../../../sign/signup/signupUtils/signData";
-import { BsFillArrowDownCircleFill } from "react-icons/bs";
-import { BsFillArrowUpCircleFill } from "react-icons/bs";
-import Cookies from "universal-cookie";
-const { Title } = Typography;
+const opt = (val) => (val == "null" || !val ? null : val);
 const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
   const [searchFilter, setSearchFilter] = useState({
-    specialty: window.localStorage.getItem("specialty") || "",
-    doctorName: window.localStorage.getItem("doctorName") || "",
-    location: window.localStorage.getItem("location") || "",
+    specialty: opt(window.localStorage.getItem("specialty")) || "",
+    doctorName: opt(window.localStorage.getItem("doctorName")) || "",
+    location: opt(window.localStorage.getItem("location")) || "",
   });
   const searchElement = useRef(null);
   const [heightSearch, setHeightSearch] = useState(0);
@@ -52,9 +48,9 @@ const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
     [searchFilter]
   );
   useEffect(() => {
-    window.localStorage.setItem("specialty", searchFilter.specialty);
-    window.localStorage.setItem("doctorName", searchFilter.doctorName);
-    window.localStorage.setItem("location", searchFilter.location);
+    window.localStorage.setItem("specialty", searchFilter.specialty || "");
+    window.localStorage.setItem("doctorName", searchFilter.doctorName || "");
+    window.localStorage.setItem("location", searchFilter.location || "");
     fetchDoctorsData({
       specialty: searchFilter.specialty,
       dname: searchFilter.doctorName,
@@ -65,14 +61,14 @@ const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
     <>
       <div
         ref={searchElement}
-        className="p-2 shadow-lg bg-gray-600"
+        className="p-2 shadow-lg rounded-bl-lg mx-2 bg-gray-600"
         style={{
           transition: "all 0.2s linear",
           position: "relative",
           marginTop: `${showSearch ? 0 : -heightSearch - 1}px`,
         }}
       >
-        <div
+        {/* <div
           className="flex flex-col cursor-pointer gap-2 opacity-90 justify-center items-center bg-gray-700"
           onClick={() => setShowSearch((val) => !val)}
           style={{
@@ -103,7 +99,7 @@ const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
               }}
             />
           )}
-        </div>
+        </div> */}
         <HeaderLine value="Search For a Doctor" center />
         <div className="flex flex-wrap gap-2">
           <div className="grow w-full sm:w-1/3">
@@ -148,7 +144,7 @@ const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
           </div>
           <div className="grow w-full sm:w-1/3">
             <HeaderLine
-              value="location"
+              value="by location"
               classLine="w-full sm:w-1/3  h-3"
               size="sm"
               font="medium"
@@ -193,10 +189,19 @@ const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
           </Button> */}
         </div>
       </div>
-      <h1 className="text-center my-5 text-2xl sm:text-4xl">
-        {" "}
-        {searchFilter.doctorName} 💡 {searchFilter?.specialty || "Doctors"}
-      </h1>
+      <div
+        onClick={() => setShowSearch((val) => !val)}
+        style={{
+          maxWidth: "50%",
+          minWidth: "100px",
+        }}
+        className="border-gray-700 cursor-pointer hover:bg-gray-800 break-all  rounded-bl-lg rounded-br-lg border-2 p-2 bg-gray-700 block w-fit m-auto"
+      >
+        <h1 className="text-center my-5 text-2xl sm:text-4xl text-white">
+          {" "}
+          {searchFilter.doctorName} 🔍 {searchFilter?.specialty}
+        </h1>
+      </div>
     </>
   );
 });

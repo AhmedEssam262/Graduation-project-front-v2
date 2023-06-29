@@ -9,19 +9,13 @@ import {
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "universal-cookie";
+import { useUserContext } from "./UserContextProvider";
 
 const DashboardData = createContext(null);
-const DashboardContextProvider = ({
-  children,
-  token,
-  fetchUserData,
-  messageApi,
-}) => {
+const DashboardContextProvider = ({ children, token }) => {
+  const { fetchUserData } = useUserContext();
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  const location = useLocation();
   const [dashboardData, setDashboardData] = useState({});
-  useReducer();
   const host = window?.location?.hostname;
   const fetchDashboardData = async (active, directToken) => {
     setIsLoading(true);
@@ -81,7 +75,6 @@ const DashboardContextProvider = ({
         dashboardData,
         fetchDashboardData,
         setDashboardData,
-        messageApi,
       }}
     >
       {children}

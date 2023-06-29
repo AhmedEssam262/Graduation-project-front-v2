@@ -158,6 +158,10 @@ const AppointmentDetails = ({
                 value={appointmentDetails?.appointmentDuration}
                 options={[
                   {
+                    label: "1.30 min",
+                    value: 90 * 1000,
+                  },
+                  {
                     label: "15 min",
                     value: 15 * 60 * 1000,
                   },
@@ -283,6 +287,34 @@ const AppointmentDetails = ({
             />
             <label className="text-gray-700 cursor-pointer font-medium">
               in Clinic
+            </label>
+          </div>
+          <div
+            onClick={() =>
+              setAppointmentDetails((val) => ({
+                ...val,
+                appointmentType: "videoCall",
+              }))
+            }
+            className="flex cursor-pointer justify-center items-center gap-2"
+          >
+            <input
+              type="radio"
+              name={`appointment_type_${order}`}
+              value="videoCall"
+              checked={
+                appointmentDetails.appointmentType == "videoCall" ? true : false
+              }
+              onChange={(e) =>
+                setAppointmentDetails((appDet) => ({
+                  ...appDet,
+                  appointmentType: e.target.value,
+                }))
+              }
+              className="h-4 w-4 cursor-pointer bg-gray-500"
+            />
+            <label className="text-gray-700 cursor-pointer font-medium">
+              Video Call
             </label>
           </div>
         </div>

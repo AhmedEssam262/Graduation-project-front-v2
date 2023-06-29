@@ -9,6 +9,9 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import Title from "antd/es/typography/Title";
 import Cookies from "universal-cookie";
+import { useUtilsContext } from "../../../contexts/UtilsContextProvider";
+import { useUserContext } from "../../../contexts/UserContextProvider";
+import { useTranslation } from "react-i18next";
 const getMessage = (key, type, content, duration) => ({
   key,
   type,
@@ -37,7 +40,7 @@ const signing = (
         headers: {
           "Content-Type": "application/json",
         },
-       // withCredentials: true,
+        withCredentials: false,
       }
     )
     .then(async ({ data }) => {
@@ -83,8 +86,13 @@ const signing = (
       }
     });
 };
-const Login = ({ isTokenExpired, fetchUserData, user }) => {
-  const [messageApi, contextHolder] = message.useMessage();
+const Login = () => {
+  const { messageApi, t } = useUtilsContext();
+  const {
+    tokenExpired: isTokenExpired,
+    fetchUserData,
+    userData: user,
+  } = useUserContext();
   const [validState, setValidState] = useState({
     invalidUser: 0,
     invalidPass: 0,
@@ -104,33 +112,34 @@ const Login = ({ isTokenExpired, fetchUserData, user }) => {
       className="form--in--wrapper grow"
       style={{
         background:
-          "linear-gradient(to top right, rgb(32 58 89 / 90%), #a1858bff)",
+          "linear-gradient(to right top,rgb(93 98 128 / 85%) , rgb(108 146 192 / 90%))", // "linear-gradient(to right top, rgb(124 163 211 / 90%), rgb(77 82 108 / 85%))"
+        // "linear-gradient(to right top, rgba(32, 58, 89, 0.9), #334297d9)",
+        // "linear-gradient(to top right, rgb(32 58 89 / 90%), #a1858bff)",
       }}
     >
-      {contextHolder}
       <div
-        className="p-10 grow
+        className="py-10 px-3 sm:px-10  grow
       flex justify-start mt-20 flex-col items-center"
       >
         <HeaderLine
-          value="Login"
+          value={t("Login")}
           center
           invisible
           size="no"
-          classText="text-5xl xl:text-6xl"
+          classText="text-4xl sm:text-5xl xl:text-6xl"
           style={{ color: "white", marginBottom: "65px" }}
           lineStyle={{ marginBottom: "65px" }}
         />
         {isTokenExpired && (
           <Title level={5} className=" !text-red-400 !text-xs">
-            Your Time Has Expired, you can sign-in again
+            {t("Your Time Has Expired, you can sign-in again")}
           </Title>
         )}
         <Form
           name="entry"
           colon={false}
           size="large"
-          className="w-full sm:w-4/5 lg:w-1/2 2xl:w-1/3 !bg-transparent"
+          className="w-full sm:w-3/4 lg:w-1/2 2xl:w-1/3 !bg-transparent"
           initialValues={{ remember: false }}
           autoComplete="on"
           onFinish={(val) =>
@@ -160,15 +169,15 @@ const Login = ({ isTokenExpired, fetchUserData, user }) => {
             rules={[
               {
                 required: true,
-                message: "Please input your username!",
+                message: `${t("Please input your username!")}`,
               },
               {
                 pattern: "^([A-Z]|[a-z])+.{0,22}$",
-                message: "must begin with letters and max 22 character",
+                message: `${t("must begin with letters and max 22 character")}`,
               },
             ]}
           >
-            <Input prefix={<UserOutlined />} placeholder="username" />
+            <Input prefix={<UserOutlined />} placeholder={t("Username")} />
           </Item>
           <Item
             name="password"
@@ -181,27 +190,31 @@ const Login = ({ isTokenExpired, fetchUserData, user }) => {
             rules={[
               {
                 required: true,
-                message: "Please input your password!",
+                message: `${t("Please input your password!")}`,
               },
               {
-                message: `Minimum 8 and maximum 14 characters, at least 
-              one uppercase letter, one lowercase letter  `,
+                message: `${t(
+                  "Minimum 8 and maximum 14 characters, at least one uppercase letter, one lowercase letter"
+                )}  `,
                 pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,14}$",
               },
             ]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="Password" />
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder={t("Password")}
+            />
           </Item>
           <Item name="remember" valuePropName="checked">
-            <Checkbox style={{ color: "white" }}>Remember me</Checkbox>
+            <Checkbox style={{ color: "white" }}>{t("Remember me")}</Checkbox>
           </Item>
           <Item>
             <Button
               type="primary"
-              className="w-full !border !border-white"
+              className="w-full !bg-blue-600/80 hover:!bg-blue-600 !border !border-white"
               htmlType="submit"
             >
-              Submit
+              {t("Submit")}
             </Button>
           </Item>
         </Form>

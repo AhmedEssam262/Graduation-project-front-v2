@@ -69,7 +69,7 @@ const Cards = ({
               />
             ))}
           </div>
-        ) : chatData ? (
+        ) : chatData?.length > 0 ? (
           <Segmented
             className="user--segment !bg-blue-200"
             size="small"

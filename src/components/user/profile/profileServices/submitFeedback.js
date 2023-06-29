@@ -36,7 +36,7 @@ const submitFeedback = async (
       }
     )
     .then((res) => {
-      if (res?.data?.data?.isFirst)
+      if (!res?.data?.data?.update)
         messageApi.open({
           key: 1,
           content: "thank you for your feedback ❤",
@@ -46,7 +46,7 @@ const submitFeedback = async (
       else
         messageApi.open({
           key: 1,
-          content: "thank you for your feedback ❤ , feedback updated",
+          content: "thank you for your feedback update ❤",
           type: "success",
           duration: 2,
         });

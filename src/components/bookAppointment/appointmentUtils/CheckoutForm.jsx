@@ -157,12 +157,19 @@ const CheckoutForm = ({
         />
         <PaymentElement id="payment-element" options={paymentElementOptions} />
         <button
-          className="payment--button"
+          className={`payment--button ${
+            isLoading || !stripe || !elements ? "!cursor-not-allowed" : ""
+          }`}
           disabled={isLoading || !stripe || !elements}
           id="submit"
           onClick={handleSubmit}
         >
-          <span id="button-text">
+          <span
+            id="button-text"
+            className={`${
+              isLoading || !stripe || !elements ? "!cursor-not-allowed" : ""
+            }`}
+          >
             {isLoading ? (
               <div className="payment--spinner" id="spinner"></div>
             ) : (

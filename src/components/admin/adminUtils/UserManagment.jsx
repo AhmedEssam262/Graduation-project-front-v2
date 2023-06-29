@@ -25,12 +25,12 @@ const UserManagment = ({ socket }) => {
   const searchInput = useRef(null);
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
+    //setSearchText(selectedKeys[0]);
+    //setSearchedColumn(dataIndex);
   };
   const handleReset = (clearFilters) => {
     clearFilters();
-    setSearchText("");
+    //setSearchText("");
   };
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({

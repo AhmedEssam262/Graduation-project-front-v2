@@ -21,12 +21,25 @@
 ::-webkit-scrollbar {
   width: 7px;
 }
+/*
 ::-webkit-scrollbar-thumb {
   background-color: rgb(38, 65, 91);
   border-radius: 40px;
 }
 ::-webkit-scrollbar-track {
   background-color: transparent;
+} */
+
+::-webkit-scrollbar-thumb {
+  /* background: #425363; */
+  background: #2b669d;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #b8c0c8;
+}
+::-webkit-scrollbar-track {
+  background: #d8e3ee;
 }
 
 /* color-picker style  */

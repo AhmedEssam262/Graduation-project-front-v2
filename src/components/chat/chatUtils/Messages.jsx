@@ -14,6 +14,7 @@ import Message from "./Message";
 import ChatAvailability from "./ChatAvailability";
 import { AppointmentContextProvider } from "../../../contexts";
 import dayjs from "dayjs";
+import { useChatContext } from "../../../contexts/ChatContextProvider";
 const getDate = (issued_date, issued_time, timeZone) =>
   issued_date
     ? dayjs(`${issued_date} ${issued_time} ${timeZone}`).format("YYYY-DD-MM")
@@ -34,14 +35,16 @@ const Messages = ({
   const {
     fetchMessagesData,
     messagesData,
+    isError: isMessageError,
     isLoading: isMessageLoading,
   } = useMessagesContext();
+  const { fetchChatData, isError: isChatError } = useChatContext();
   const [messages, setMessages] = useState([]);
   const messageContainer = useRef(null);
   const [message, setMessage] = useState();
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  console.log(isMessageLoading);
+  const isError = isChatError || isMessageError;
   useEffect(() => {
     if (withUser)
       fetchMessagesData(new Cookies().get("accessToken"), {
@@ -88,7 +91,11 @@ const Messages = ({
         ref={messageContainer}
         className="message--container flex flex-col-reverse border-gray-100 px-4 overflow-auto scroll--v scroll--v--chat"
       >
-        <div className="grow flex flex-col gap-3">
+        <div
+          className={`${
+            isMessageLoading ? "overflow-hidden" : ""
+          } grow flex flex-col gap-3`}
+        >
           {!isMessageLoading
             ? messages?.map(
                 (
@@ -135,7 +142,7 @@ const Messages = ({
               ))}
         </div>
       </div>
-      {isOpen ? (
+      {isOpen && !isError && !isMessageLoading ? (
         <div className="bg-gray-100 mt-2 rounded-lg">
           <div className="flex gap-2 items-center p-2">
             <Input
@@ -171,7 +178,8 @@ const Messages = ({
                       socket,
                       setMessage,
                       user_id,
-                      setIsLoading
+                      setIsLoading,
+                      fetchChatData
                     )
                   }
                 />
@@ -191,7 +199,7 @@ const Messages = ({
             />
           )}
         </div>
-      ) : withUserType == "doctor" ? (
+      ) : withUserType == "doctor" && !isError && !isMessageLoading ? (
         <AppointmentContextProvider>
           <ChatAvailability
             withUserType={withUserType}
@@ -200,15 +208,16 @@ const Messages = ({
             withNickName={withNickName}
           />
         </AppointmentContextProvider>
-      ) : (
+      ) : !isMessageLoading ? (
         <div className="bg-gray-600 px-1 rounded-tr-lg py-8 rounded-tl-lg font-medium text-white">
           <div className="text-center">
             <div className="text-lg text-gray-300  font-bold">
-              Cannot Chat with {withNickName || "That User"} right now
+              Cannot Chat with {withNickName || isError || "That User"} right
+              now
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </>
   );
 };

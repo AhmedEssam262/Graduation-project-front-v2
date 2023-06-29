@@ -1,6 +1,20 @@
-import React from "react";
+import {
+  Loading3QuartersOutlined,
+  LoadingOutlined,
+  VideoCameraFilled,
+  VideoCameraTwoTone,
+} from "@ant-design/icons";
+import axios from "axios";
+import React, { useState } from "react";
 import { BsFillChatFill } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Cookies from "universal-cookie";
+import { useUserContext } from "../../../contexts/UserContextProvider";
+import { useUtilsContext } from "../../../contexts/UtilsContextProvider";
+const APPLICATION_SERVER_URL =
+  process.env.NODE_ENV === "production"
+    ? ""
+    : `http://${window.location.hostname}:8000`;
 const getAppointmentVal = (
   appointment_state,
   valDone,
@@ -22,11 +36,57 @@ const getAppointmentVal = (
     ? valRunning
     : valDefault;
 const AppointmentStart = ({ appointmentDetails }) => {
-  return (
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState();
+  const { messageApi } = useUtilsContext();
+  const { fetchUserData } = useUserContext();
+  const createSession = async () => {
+    setIsLoading(true);
+    await axios
+      .post(
+        `${APPLICATION_SERVER_URL}/join/meeting`,
+        { data: { appointment_id: appointmentDetails?.appointment_id } },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${new Cookies().get("accessToken")}`,
+          },
+        }
+      )
+      .then((res) => {
+        navigate(
+          `/join/meeting/${res.data}?appointment_id=${appointmentDetails?.appointment_id}`
+        );
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        if (err?.response?.status == 400) {
+          messageApi.open({
+            key: 1,
+            type: "warning",
+            content: "there's something missing, try to re-login",
+            duration: 3,
+          });
+          return;
+        } else if (err?.response?.status == 401) {
+          fetchUserData(true, new Cookies.get("accessToken"));
+          return;
+        }
+        messageApi.open({
+          key: 1,
+          type: "error",
+          content: "there's something wrong",
+          duration: 3,
+        });
+        setIsLoading(false);
+      });
+  };
+  return (appointmentDetails?.appointment_state == "running" &&
+    appointmentDetails?.appointment_type == "chat") ||
+    appointmentDetails?.appointment_type == "videoCall" ? (
     <div className="text-white grow">
-      <div className="chat--details h-full">
-        {appointmentDetails?.appointment_state == "running" &&
-        appointmentDetails?.appointment_type == "chat" ? (
+      {appointmentDetails?.appointment_type == "chat" ? (
+        <div className="chat--details h-full">
           <Link
             to="/chat"
             onClick={() =>
@@ -37,10 +97,25 @@ const AppointmentStart = ({ appointmentDetails }) => {
             Chat with {appointmentDetails?.withNickName}
             <BsFillChatFill className="text-white text-xl" />
           </Link>
-        ) : null}
-      </div>
+        </div>
+      ) : (
+        <div
+          onClick={() => createSession()}
+          className={`video--details p-2 bg-blue-600/80 hover:bg-blue-600 cursor-pointer
+           rounded shadow-md h-full ${isLoading ? "cursor-not-allowed" : ""}`}
+        >
+          <div className="font-medium h-full flex items-center gap-2 flex-wrap hover:!text-gray-200 text-xl !flex !justify-center !items-center gap-2 hover:!bg-blue-700 !block text-white bg-blue-700/90 p-2 rounded-md">
+            Video Call with {appointmentDetails?.withNickName}
+            {!isLoading ? (
+              <VideoCameraFilled className="!flex !items-center !text-white !text-3xl" />
+            ) : (
+              <LoadingOutlined className="!flex !items-center !text-white !text-3xl" />
+            )}
+          </div>
+        </div>
+      )}
     </div>
-  );
+  ) : null;
 };
 
 export default AppointmentStart;

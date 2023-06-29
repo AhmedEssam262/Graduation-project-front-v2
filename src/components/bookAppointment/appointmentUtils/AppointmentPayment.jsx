@@ -28,28 +28,29 @@ const AppointmentPayment = ({
   useEffect(() => {
     const host = window?.location?.hostname;
     // Create PaymentIntent as soon as the page loads
-    axios
-      .request(`http://127.0.0.1:8000/api/payment/stripe`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${new Cookies()?.get("accessToken")}`,
-        },
-        data: JSON.stringify({
-          data: {
-            doctorId,
-            selectedDate,
-            ...bookedAppointment,
+    if (bookedAppointment?.appointmentId && doctorId) {
+      axios
+        .request(`http://127.0.0.1:8000/api/payment/stripe`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${new Cookies()?.get("accessToken")}`,
           },
-        }),
-      })
-      .then(({ data }) => {
-        setClientSecret(data.clientSecret);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [bookedAppointment?.slotTime, doctorId]);
+          data: JSON.stringify({
+            data: {
+              doctorId,
+              ...bookedAppointment,
+            },
+          }),
+        })
+        .then(({ data }) => {
+          setClientSecret(data.clientSecret);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [bookedAppointment?.appointmentId, doctorId]);
 
   const appearance = {
     theme: "stripe",
@@ -69,7 +70,7 @@ const AppointmentPayment = ({
             setBookedAppointment={setBookedAppointment}
             bookedAppointment={bookedAppointment}
             doctorId={doctorId}
-            selectedDate={selectedDate}
+            selectedDate={bookedAppointment?.schedule_date}
             messageApi={messageApi}
           />
         </Elements>

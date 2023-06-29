@@ -44,6 +44,8 @@ import ClinicForm from "./profileUtils/ClinicForm";
 import ClinicRegister from "./profileUtils/ClinicRegister";
 import ClinicDetails from "./profileUtils/ClinicDetails";
 import AccountVerify from "../../doctorDashboard/dashboardUtils/scheduleUtils/AccountVerify";
+import { useUserContext } from "../../../contexts/UserContextProvider";
+import { useUtilsContext } from "../../../contexts/UtilsContextProvider";
 const editingObject = (value, setValue, name, normal) => ({
   onChange: (newValue) => setValue((val) => ({ ...val, [name]: newValue })),
   icon: (normal && null) || <BiEdit color="white" className="text-white" />,
@@ -56,20 +58,20 @@ const editingObject = (value, setValue, name, normal) => ({
   // }
 });
 
-const UserProfile = ({
-  userid,
-  fetchUserData,
-  isUserLoading,
-  socket,
-  timeZone,
-}) => {
+const UserProfile = () => {
   const { username } = useParams();
+  const { socket, timeZone, messageApi } = useUtilsContext();
+  const {
+    isLoading: isUserLoading,
+    fetchUserData,
+    userData: user,
+  } = useUserContext();
   const [rateValue, setRateValue] = useState(0);
   const [showEdit, setShowEdit] = useState(false);
   const [fetchFeedback, setFetchFeedback] = useState();
-  const [messageApi, contextHolder] = message.useMessage();
   const { isLoading, profileData, fetchProfileData, isError } =
     useProfileContext();
+  const userid = user?.user_id;
   useEffect(() => {
     fetchProfileData({ path: "profile", username: username || userid });
   }, []);
@@ -125,15 +127,12 @@ const UserProfile = ({
   const isUser = profileData?.["user"]?.user_type == "doctor" ? false : true; // check user profile
   const isAuth = userid && profileId == userid ? true : false; // user visit his profile
   const isProfile = profileData?.["user"];
-  const isVerified = true;
-
-  //const isVerified = profileData?.["doctor"]?.is_verified;
+  const isVerified = profileData?.["doctor"]?.is_verified;
   const showDrawer = (type, name, className) => {
     setHandleDrawer(() => ({ isOpen: true, type, name, className }));
   };
   return (
     <div className="profile--wrapper">
-      {contextHolder}
       {isProfile ? (
         <>
           {isVisitor ? (
@@ -165,6 +164,7 @@ const UserProfile = ({
                 <Image
                   src={
                     userValues?.images?.[0]?.img_url ||
+                    userValues?.images?.img_url ||
                     (isUser ? userPhoto : doctorPhoto)
                   }
                   width={130}
@@ -345,7 +345,7 @@ const UserProfile = ({
                       <Rate
                         onChange={setRateValue}
                         allowHalf
-                        defaultValue={1}
+                        defaultValue={0}
                       />
                       <Title className="!text-xs !mt-4 !font-medium">
                         Write Any feedback About your experince with Dr.{" "}

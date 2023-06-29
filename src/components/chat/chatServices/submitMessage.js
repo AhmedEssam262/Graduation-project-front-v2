@@ -11,7 +11,8 @@ const submitMessage = async (
   socket,
   setContent,
   user_id,
-  setIsLoading
+  setIsLoading,
+  fetchChatData
 ) => {
   const data = { content, message_to, isFirst };
   const host = window?.location?.hostname;
@@ -63,6 +64,21 @@ const submitMessage = async (
       setIsLoading(false);
       if (err?.response?.status == 401) {
         fetchUserData(true, cookies.get("accessToken"));
+      } else if (err?.response?.status == 403) {
+        fetchChatData(
+          true,
+          cookies.get("accessToken"),
+          {
+            chat_to: message_to,
+          },
+          true
+        );
+        messageApi.open({
+          key: 1,
+          content: "we're sorry but your chat is closed now",
+          type: "warning",
+          duration: 2,
+        });
       } else
         messageApi.open({
           key: 1,

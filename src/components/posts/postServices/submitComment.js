@@ -11,7 +11,8 @@ const submitComment = async (
   commentId,
   setReply,
   socket,
-  lenViewedComments
+  lenViewedComments,
+  setLen
 ) => {
   const data = { content, postId, commentId };
   messageApi.open({
@@ -48,6 +49,7 @@ const submitComment = async (
         },
         true
       );
+      setLen((val) => val + 1);
       socket.emit("send_comment", {
         //...res?.data?.data,
         reply_on: commentId,

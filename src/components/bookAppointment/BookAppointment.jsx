@@ -89,7 +89,7 @@ function BookAppointment({ userid, doctorId, socket, timeZone }) {
     setFreeSlots(slotsData?.freeSlots);
   }, [slotsData, selectedDate?.format("YYYY-MM-DD")]);
   useEffect(() => {
-    socket.emit("join_appointments", doctorId);
+    socket.emit("join_doctor", doctorId);
   }, []);
   useEffect(() => {
     const getSlots = (data) => {
@@ -137,9 +137,9 @@ function BookAppointment({ userid, doctorId, socket, timeZone }) {
           <>
             {!freeSlots ? (
               <Empty
-                className="!mt-2"
+                className="!mt-3"
                 description={
-                  <span className="font-medium text-gray-700">
+                  <span className="font-medium text-gray-400">
                     there's no Appointments available yet
                   </span>
                 }
@@ -237,9 +237,9 @@ function BookAppointment({ userid, doctorId, socket, timeZone }) {
                   </Popover>
                 ) : (
                   <Empty
-                    className="!mt-2"
+                    className="!mt-3"
                     description={
-                      <span className="font-medium text-gray-700">
+                      <span className="font-medium text-gray-400">
                         all Appointments booked
                       </span>
                     }
@@ -285,9 +285,9 @@ function BookAppointment({ userid, doctorId, socket, timeZone }) {
           <Loader />
         ) : (
           <Empty
-            className="!mt-2"
+            className="!mt-3"
             description={
-              <span className="font-medium text-gray-700">
+              <span className="font-medium text-gray-400">
                 choose recently date (uptodate)
               </span>
             }

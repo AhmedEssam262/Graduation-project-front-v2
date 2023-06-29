@@ -13,6 +13,7 @@ import { BiMessageAltDetail } from "react-icons/bi";
 import { TbEditCircle } from "react-icons/tb";
 import { HiStatusOnline } from "react-icons/hi";
 import { MdFreeCancellation, MdAutoDelete } from "react-icons/md";
+import { VideoCameraFilled } from "@ant-design/icons";
 const adjustTime = (date, time, timeZone) =>
   new Date(`${date} ${time} ${timeZone}`).toLocaleTimeString("en", {
     hour: "numeric",
@@ -166,6 +167,8 @@ const AppointmentCard = ({
             <FaClinicMedical className="!flex items-center !text-gray-200 !text-xl" />
           ) : appointmentType == "chat" ? (
             <BiMessageAltDetail className="!flex items-center !text-gray-200 !text-xl" />
+          ) : appointmentType == "videoChat" ? (
+            <VideoCameraFilled className="!flex items-center !text-gray-200 !text-xl" />
           ) : null}
           {/* {
                       getAppointmentVal(

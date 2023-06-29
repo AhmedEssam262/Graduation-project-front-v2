@@ -25,7 +25,8 @@ const MessagesContextProvider = ({
   noFirstRender,
   query,
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
   const [messagesData, setMessagesData] = useState(null);
   const host = window?.location?.hostname;
   const fetchMessagesData = async (token, query, noRender) => {
@@ -42,10 +43,12 @@ const MessagesContextProvider = ({
         }
       );
       setMessagesData(() => data?.data);
+      setIsError(false);
       setIsLoading(false);
       return data;
     } catch (err) {
       const msg = err?.response?.data?.data?.name;
+      setIsError(true);
       switch (msg) {
         case "TokenExpiredError":
           fetchUserData(true, null, {
@@ -81,7 +84,7 @@ const MessagesContextProvider = ({
   // }, []);
   return (
     <MessagesData.Provider
-      value={{ isLoading, messagesData, fetchMessagesData }}
+      value={{ isLoading, messagesData, fetchMessagesData, isError }}
     >
       {children}
     </MessagesData.Provider>

@@ -14,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { SlotsContextProvider } from "../../../../contexts";
 import BookCard from "./BookCard";
 import dayjs from "dayjs";
+import { useUtilsContext } from "../../../../contexts/UtilsContextProvider";
 const DoctorCard = ({
   profileImage,
   rate,
@@ -29,7 +30,9 @@ const DoctorCard = ({
   city,
   street,
   phone,
+  isLast,
 }) => {
+  const { t } = useUtilsContext();
   const navigate = useNavigate();
   const [isPayment, setIsPayment] = useState();
   const cardDetails = [
@@ -40,19 +43,19 @@ const DoctorCard = ({
           value: specialty,
         },
         {
-          label: "Clinic Location",
-          value: city,
+          label: "Fees",
+          value: fees,
         },
       ],
     },
     {
       data: [
         {
-          label: "Fees",
-          value: fees,
+          label: "Clinic Location",
+          value: city,
         },
         {
-          label: "Street",
+          label: "Clinic Street",
           value: street,
         },
       ],
@@ -64,16 +67,20 @@ const DoctorCard = ({
           value: about,
         },
         {
-          label: "phone",
+          label: "Clinic Phone",
           value: phone,
         },
       ],
     },
   ];
   return (
-    <div className={`w-1/2 grow !cursor-default !my-2 sm:!m-2 xl:w-1/3`}>
+    <div
+      className={`${
+        isLast ? "" : "grow xl:w-1/3"
+      } !cursor-default !my-2 sm:!m-2`}
+    >
       <Card
-        className="!p-2 !h-full"
+        className="!flex !flex-col !rounded !p-2 !h-full"
         hoverable
         // cover={
 
@@ -103,10 +110,11 @@ const DoctorCard = ({
         }
         bodyStyle={{
           padding: "5px",
+          flexGrow: 1,
         }}
         actions={[]}
       >
-        <div className="flex flex-col sm:flex-row">
+        <div className="h-full flex flex-col sm:flex-row sm:justify-between gap-2">
           <SlotsContextProvider>
             <BookCard
               setIsPayment={setIsPayment}
@@ -133,18 +141,21 @@ const DoctorCard = ({
               />
               <div className="text-center">
                 <Rate value={rate} disabled />
+                <hr className="border-1 m-2 border-gray-300 shadow-lg" />
               </div>
             </div>
-            <div className="grow">
+            <div className="grow flex flex-col justify-center">
               {cardDetails?.map(({ data }, i) => (
                 <div key={i + 1}>
-                  <hr className="border-1 m-2 border-gray-300 shadow-lg" />
-                  <div className="flex flex-wrap justify-between gap-1 font-bold font-mono">
+                  {i !== 0 ? (
+                    <hr className="border-1 m-2 border-gray-300 shadow-lg" />
+                  ) : null}
+                  <div className="flex flex-wrap justify-between gap-2 font-bold font-mono">
                     {data?.map(({ label, value }) => (
                       <div key={label}>
-                        <span>{label}: </span>
+                        <span>{t(label)}: </span>
                         {value ? (
-                          <span className="text-blue-800">{value}</span>
+                          <span className="text-blue-800">{t(value)}</span>
                         ) : (
                           <StopOutlined />
                         )}

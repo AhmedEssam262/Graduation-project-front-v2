@@ -143,7 +143,9 @@ const Chat = ({ isAdmin, isChat }) => {
             <Messages
               key={withUser || "user"}
               isOpen={
-                user?.user_type == "user" && withUser !== user?.user_id
+                chatRecord?.user_type == "admin" && !chatRecord?.chat_from
+                  ? true
+                  : user?.user_type == "user" && withUser !== user?.user_id
                   ? chatRecord?.is_open == 1
                   : !chatRecord?.is_open ||
                     ((chatRecord?.user_type == "user" ||

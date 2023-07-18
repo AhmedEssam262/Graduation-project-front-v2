@@ -29,7 +29,7 @@ const PopUp = ({
         <div
           style={{
             backdropFilter: "blur(20px)",
-            zIndex: 80000000,
+            zIndex: 80,
           }}
           className={`mask--booked transition-all duration-500 fixed flex items-start justify-center top-0 left-0 h-full w-full`}
         >

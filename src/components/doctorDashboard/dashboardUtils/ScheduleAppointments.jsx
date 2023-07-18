@@ -91,6 +91,7 @@ const ScheduleAppointments = ({
   const isUpToDate =
     selectedDate?.$d?.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0);
   const tAppointments = slotsData?.totalSlots;
+  console.log(tAppointments);
   return (
     <div
       className={`schedule--wrapper

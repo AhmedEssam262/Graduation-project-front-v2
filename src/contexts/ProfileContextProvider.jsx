@@ -12,7 +12,7 @@ const ProfileContextProvider = ({ children }) => {
     setIsError(false);
     try {
       const { data } = await axios.request(
-        `http://127.0.0.1:8000/api/${path}/${username}`,
+        `http://${host}:8000/api/${path}/${username}`,
         { timeout: 8000 }
       );
       setProfileData(data?.data);

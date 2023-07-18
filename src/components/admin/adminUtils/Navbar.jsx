@@ -79,11 +79,11 @@ const Navbar = ({
           icon={<BsChatLeft />}
         />
         <NavButton
-          name="notification"
+          name="reports"
           dashType={dashType}
-          title="Notification"
+          title="reports"
           dotColor="rgb(254, 201, 15)"
-          customFunc={() => setDashType("notification")}
+          customFunc={() => setDashType("reports")}
           icon={<RiNotification3Line />}
         />
         <div

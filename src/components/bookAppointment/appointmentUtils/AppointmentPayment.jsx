@@ -7,6 +7,8 @@ import axios from "axios";
 import Cookies from "universal-cookie";
 import Loader from "../../Loader";
 import getStripe from "./getStripe";
+import { useUserContext } from "../../../contexts/UserContextProvider";
+import { useUtilsContext } from "../../../contexts/UtilsContextProvider";
 
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
@@ -18,19 +20,19 @@ const AppointmentPayment = ({
   bookedAppointment,
   selectedDate,
   doctorId,
-  messageApi,
   setBookedAppointment,
   setIsPayment,
   socket,
 }) => {
   const [clientSecret, setClientSecret] = useState("");
-
+  const { messageApi } = useUtilsContext();
+  const { fetchUserData } = useUserContext();
   useEffect(() => {
     const host = window?.location?.hostname;
     // Create PaymentIntent as soon as the page loads
     if (bookedAppointment?.appointmentId && doctorId) {
       axios
-        .request(`http://127.0.0.1:8000/api/payment/stripe`, {
+        .request(`http://${host}:8000/api/create/payment`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -47,7 +49,16 @@ const AppointmentPayment = ({
           setClientSecret(data.clientSecret);
         })
         .catch((err) => {
-          console.log(err);
+          setIsPayment(null);
+          if (err?.response?.status == 401) {
+            fetchUserData(true, new Cookies().get("accessToken"));
+          } else
+            messageApi.open({
+              key: 1,
+              type: "error",
+              content: "there's some issues, please try again later",
+              duration: 5,
+            });
         });
     }
   }, [bookedAppointment?.appointmentId, doctorId]);

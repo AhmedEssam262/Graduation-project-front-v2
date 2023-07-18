@@ -12,7 +12,7 @@ import { FcVideoCall } from "react-icons/fc";
 const APPLICATION_SERVER_URL =
   process.env.NODE_ENV === "production"
     ? ""
-    : `http://${window.location.hostname}:8000`;
+    : `http://${window.location.hostname}:5000`;
 
 class VideoMeeting extends Component {
   constructor(props) {

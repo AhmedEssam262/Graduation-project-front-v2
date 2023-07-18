@@ -34,7 +34,7 @@ const ChatContextProvider = ({ children, token }) => {
     }
     try {
       const { data } = await axios.request(
-        `http://127.0.0.1:8000/api/get/chat${handleQuery(query)}`,
+        `http://${host}:8000/api/get/chat${handleQuery(query)}`,
         {
           headers: {
             Authorization: `Bearer ${active ? directToken : token}`,
@@ -47,7 +47,6 @@ const ChatContextProvider = ({ children, token }) => {
       setIsLoading(false);
     } catch (err) {
       const msg = err?.response?.data?.data?.name;
-      setIsError(true);
       switch (msg) {
         case "TokenExpiredError":
           fetchUserData(true, null, {
@@ -73,6 +72,7 @@ const ChatContextProvider = ({ children, token }) => {
           });
           break;
         default:
+          setIsError(true);
           setChatData(null);
           break;
       }

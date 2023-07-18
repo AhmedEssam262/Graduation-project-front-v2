@@ -11,10 +11,9 @@ import {
 } from "antd";
 import { MessageOutlined, StopOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
-import { SlotsContextProvider } from "../../../../contexts";
+import { SlotsContextProvider } from "../../../contexts";
 import BookCard from "./BookCard";
-import dayjs from "dayjs";
-import { useUtilsContext } from "../../../../contexts/UtilsContextProvider";
+import { useUtilsContext } from "../../../contexts/UtilsContextProvider";
 const DoctorCard = ({
   profileImage,
   rate,

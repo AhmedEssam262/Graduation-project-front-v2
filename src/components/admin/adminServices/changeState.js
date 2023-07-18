@@ -30,7 +30,7 @@ const changeState = async (
   setIsLoading(true);
   axios
     .post(
-      `http://127.0.0.1:8000/api/change/${isUser ? "user" : "doctor"}`,
+      `http://${host}:8000/api/change/${isUser ? "user" : "doctor"}`,
       {
         data: {
           type,

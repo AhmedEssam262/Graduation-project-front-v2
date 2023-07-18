@@ -21,7 +21,7 @@ const submitLike = async (
   const host = window?.location?.hostname;
   axios
     .post(
-      `http://127.0.0.1:8000/api/submit/like`,
+      `http://${host}:8000/api/submit/like`,
       {
         data,
       },

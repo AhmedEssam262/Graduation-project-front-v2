@@ -1,9 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import {
+  MdMessage,
   MdOutlineCancel,
   MdOutlineManageAccounts,
   MdPostAdd,
+  MdReportProblem,
 } from "react-icons/md";
 import { DashboardOutlined, HomeOutlined } from "@ant-design/icons";
 import { GiDoctorFace } from "react-icons/gi";
@@ -32,6 +34,18 @@ const links = [
         key: "doctor",
         value: "Doctors Managment",
         icon: <MdOutlineManageAccounts />,
+      },
+      {
+        link: "chat",
+        key: "chat",
+        value: "Chatting",
+        icon: <MdMessage />,
+      },
+      {
+        link: "reports",
+        key: "reports",
+        value: "Reports",
+        icon: <MdReportProblem />,
       },
     ],
   },

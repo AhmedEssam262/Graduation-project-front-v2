@@ -9,7 +9,7 @@ import {
 import { useMediaQuery } from "react-responsive";
 import { message } from "antd";
 import { useTranslation } from "react-i18next";
-const socket = io.connect(`http://${window.location.hostname}:8000`);
+const socket = io.connect(`http://${window.location.hostname}:5000`);
 const timeZone = " gmt+0300";
 const UtilsData = createContext(null);
 const UtilsContextProvider = ({ children }) => {
@@ -27,8 +27,8 @@ const UtilsContextProvider = ({ children }) => {
     <UtilsData.Provider
       value={{ timeZone, socket, isMobile, messageApi, lan, t, i18n }}
     >
-      {children}
       {contextHolder}
+      {children}
     </UtilsData.Provider>
   );
 };

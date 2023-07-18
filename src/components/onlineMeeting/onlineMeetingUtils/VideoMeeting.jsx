@@ -21,7 +21,7 @@ let OV = null;
 const APPLICATION_SERVER_URL =
   process.env.NODE_ENV === "production"
     ? ""
-    : `http://${window.location.hostname}:8000`;
+    : `http://${window.location.hostname}:5000`;
 const VideoMeeting = ({ nickname, username, session, appointmentId }) => {
   const [sessionDetails, setSessionDetails] = useState({
     myNickName: nickname,
@@ -40,6 +40,9 @@ const VideoMeeting = ({ nickname, username, session, appointmentId }) => {
   const { fetchUserData } = useUserContext();
   const navigate = useNavigate();
   useEffect(() => {
+    // if (sessionDetails.session) {
+    //   joinSession();
+    // }
     return () => leaveSession();
   }, []);
   const handleChangeUserName = (e) => {
@@ -73,7 +76,8 @@ const VideoMeeting = ({ nickname, username, session, appointmentId }) => {
   const joinSession = () => {
     // --- 1) Get an OpenVidu object ---
     OV = new OpenVidu();
-    setSessionDetails((sD) => ({ ...sD, isLoading: true }));
+    if (!sessionDetails?.session)
+      setSessionDetails((sD) => ({ ...sD, isLoading: true }));
     // --- 2) Init a session ---
     const session = OV.initSession();
     setSessionDetails((sD) => ({ ...sD, session: session }));
@@ -96,11 +100,12 @@ const VideoMeeting = ({ nickname, username, session, appointmentId }) => {
     // On every Stream destroyed...
     mySession.on("streamDestroyed", (event) => {
       // Remove the stream from 'subscribers' array
-      console.log(event, "+++ streamDestroy_wa");
+      console.log(event, "+++ streamDestroy");
       deleteSubscriber(event.stream.streamManager);
     });
     mySession.on("sessionDisconnected", (event) => {
       // Remove the stream from 'subscribers' array
+      console.log("++ disconnected");
       setSessionDetails((sD) => ({
         ...sD,
         session: undefined,
@@ -114,15 +119,16 @@ const VideoMeeting = ({ nickname, username, session, appointmentId }) => {
 
     // On every asynchronous exception...
     mySession.on("exception", (exception) => {
-      setSessionDetails((sD) => ({
-        ...sD,
-        session: undefined,
-        isLoading: false,
-        sessionException: "Closed",
-        subscribers: [],
-        mainStreamManager: undefined,
-        publisher: undefined,
-      }));
+      console.log("++ exception");
+      // setSessionDetails((sD) => ({
+      //   ...sD,
+      //   session: undefined,
+      //   isLoading: false,
+      //   sessionException: "Closed",
+      //   subscribers: [],
+      //   mainStreamManager: undefined,
+      //   publisher: undefined,
+      // }));
     });
 
     // --- 4) Connect to the session with a valid user token ---
@@ -138,7 +144,6 @@ const VideoMeeting = ({ nickname, username, session, appointmentId }) => {
           })
           .then(async () => {
             // --- 5) Get your own camera stream ---
-
             // Init a publisher passing undefined as targetElement (we don't want OpenVidu to insert a video
             // element: we will manage it on our own) and with the desired properties
             let publisher = await OV.initPublisherAsync(undefined, {
@@ -193,6 +198,10 @@ const VideoMeeting = ({ nickname, username, session, appointmentId }) => {
               }
               fetchUserData(true, new Cookies().get("accessToken"));
             }
+            // setSessionDetails((sD) => ({
+            //   ...sD,
+            //   isLoading: false,
+            // }));
             setSessionDetails((sD) => ({
               ...sD,
               session: undefined,
@@ -202,11 +211,11 @@ const VideoMeeting = ({ nickname, username, session, appointmentId }) => {
               mainStreamManager: undefined,
               publisher: undefined,
             }));
-            // console.log(
-            //   "There was an error connecting to the session:",
-            //   err.code,
-            //   err.message
-            // );
+            console.log(
+              "There was an error connecting to the session:",
+              err.code,
+              err.message
+            );
           });
       })
       .catch((err) => {
@@ -245,7 +254,6 @@ const VideoMeeting = ({ nickname, username, session, appointmentId }) => {
   const leaveSession = () => {
     // --- 7) Leave the session by calling 'disconnect' method over the Session object ---
     const mySession = sessionDetails.session;
-
     if (mySession) {
       mySession.disconnect();
     }
@@ -257,7 +265,7 @@ const VideoMeeting = ({ nickname, username, session, appointmentId }) => {
       session: undefined,
       sessionException: false,
       isLoading: false,
-      sessionException: sessionDetails.subscribers.length <= 1 ? "End" : false,
+      sessionException: sessionDetails.subscribers.length < 1 ? "End" : false,
       isError: false,
       subscribers: [],
       mainStreamManager: undefined,

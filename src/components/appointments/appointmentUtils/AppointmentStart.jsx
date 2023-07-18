@@ -14,7 +14,7 @@ import { useUtilsContext } from "../../../contexts/UtilsContextProvider";
 const APPLICATION_SERVER_URL =
   process.env.NODE_ENV === "production"
     ? ""
-    : `http://${window.location.hostname}:8000`;
+    : `http://${window.location.hostname}:5000`;
 const getAppointmentVal = (
   appointment_state,
   valDone,
@@ -60,6 +60,7 @@ const AppointmentStart = ({ appointmentDetails }) => {
         setIsLoading(false);
       })
       .catch((err) => {
+        setIsLoading(false);
         if (err?.response?.status == 400) {
           messageApi.open({
             key: 1,
@@ -69,6 +70,12 @@ const AppointmentStart = ({ appointmentDetails }) => {
           });
           return;
         } else if (err?.response?.status == 401) {
+          messageApi.open({
+            key: 1,
+            type: "error",
+            content: "cannot start that appointment right now!!",
+            duration: 3,
+          });
           fetchUserData(true, new Cookies.get("accessToken"));
           return;
         }
@@ -78,7 +85,6 @@ const AppointmentStart = ({ appointmentDetails }) => {
           content: "there's something wrong",
           duration: 3,
         });
-        setIsLoading(false);
       });
   };
   return (appointmentDetails?.appointment_state == "running" &&

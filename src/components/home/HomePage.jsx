@@ -14,7 +14,7 @@ import { useMediaQuery } from "react-responsive";
 import { Link } from "react-router-dom";
 import Feedbacks from "./../feedback/Feedbacks";
 import Loader from "../Loader";
-import Doctors from "../user/doctors/Doctors";
+import Doctors from "../doctors/Doctors";
 import {
   PostsContextProvider,
   DoctorsContextProvider,
@@ -37,7 +37,6 @@ import { VscFeedback } from "react-icons/vsc";
 import TransitionContent from "../utils/transition/TransitionContent";
 import { useUserContext } from "../../contexts/UserContextProvider";
 import { useUtilsContext } from "../../contexts/UtilsContextProvider";
-import LangItem from "../navbar/navbarUtils/LangItem";
 
 const { Title } = Typography;
 const TitleHeader = ({

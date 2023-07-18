@@ -32,7 +32,7 @@ const signing = (
   delete values?.remember;
   axios
     .post(
-      `http://127.0.0.1:8000/api/login`,
+      `http://${host}:8000/api/login`,
       {
         data: values,
       },
@@ -40,7 +40,7 @@ const signing = (
         headers: {
           "Content-Type": "application/json",
         },
-        withCredentials: false,
+        // withCredentials: true,
       }
     )
     .then(async ({ data }) => {
@@ -126,7 +126,7 @@ const Login = () => {
           center
           invisible
           size="no"
-          classText="text-4xl sm:text-5xl xl:text-6xl"
+          classText="text-5xl xl:text-6xl"
           style={{ color: "white", marginBottom: "65px" }}
           lineStyle={{ marginBottom: "65px" }}
         />

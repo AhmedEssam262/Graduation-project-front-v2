@@ -38,9 +38,9 @@ const bookAppointment = (
     const host = window?.location?.hostname;
     axios
       .post(
-        `http://127.0.0.1:8000/api/book/appointment${isCheck ? "?check=true" : ""}${
-          pi ? `?pi=${pi?.id}` : ""
-        }`,
+        `http://${host}:8000/api/book/appointment${
+          isCheck ? "?check=true" : ""
+        }${pi ? `?pi=${pi?.id}` : ""}`,
         data,
         {
           headers: {

@@ -1,12 +1,10 @@
 import React, { useRef, useState } from "react";
 import { Avatar, Button, Input, Space, Table, Tag } from "antd";
 import { useDoctorsContext } from "../../../contexts/DoctorsContextProvider";
-import { ChatContextProvider, SlotsContextProvider } from "../../../contexts";
 import { ScheduleOutlined, SearchOutlined } from "@ant-design/icons";
 import "./DoctorManagment.css";
 import changeState from "../adminServices/changeState";
 import { useUserContext } from "../../../contexts/UserContextProvider";
-import AppointmentDetails from "./AppointmentDetails";
 import { useUsersContext } from "../../../contexts/UsersContextProvider";
 import { BsGenderFemale, BsGenderMale } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
@@ -15,7 +13,7 @@ import { GiDoctorFace } from "react-icons/gi";
 import doctorPhoto from "../../../images/doctorPhoto.png";
 import userPhoto from "../../../images/userPhoto.png";
 import PopUp from "../../utils/PopUp";
-import ChatRestrict from "./ChatRestrict";
+import Restrictions from "./userManagmentUtils/Restrictions";
 
 const UserManagment = ({ socket }) => {
   const [searchText, setSearchText] = useState("");
@@ -184,7 +182,7 @@ const UserManagment = ({ socket }) => {
           {value == "male" ? (
             <BsGenderMale fill="white" />
           ) : (
-            <BsGenderFemale fill="red" />
+            <BsGenderFemale fill="white" />
           )}
           <span className="font-medium capitalize">{value}</span>
         </div>
@@ -304,23 +302,14 @@ const UserManagment = ({ socket }) => {
         handleClose={() => setShowPop(null)}
         show={showPop}
       >
-        <div className="">
-          <div className="mb-2 flex justify-between items-center gap-2">
-            <div className="flex items-center gap-2">
-              <Avatar className="!w-16 !h-16" src={selectedUser?.img_url} />
-              <span className="text-xl text-gray-400">
-                {selectedUser?.nick_name}
-              </span>
-            </div>
-            <div className="p-1 bg-gray-100 shadow-md rounded-md font-medium">
-              CHAT RESTRICTIONS
-            </div>
-          </div>
-          <hr className="border-2" />
-          <ChatContextProvider>
-            <ChatRestrict userid={selectedUser?.user_id} />
-          </ChatContextProvider>
-        </div>
+        <Restrictions
+          selectedUser={{
+            user_id: selectedUser?.user_id,
+            nick_name: selectedUser?.nick_name,
+            img_url: selectedUser?.img_url,
+            user_type: selectedUser?.user_type,
+          }}
+        />
       </PopUp>
       <div
         className="flex overflow-auto scroll--h"

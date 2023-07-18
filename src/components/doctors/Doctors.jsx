@@ -1,15 +1,13 @@
-import React, { forwardRef, useEffect, useState } from "react";
-import { Carousel, Empty, Pagination, Table } from "antd";
-import Loader from "../../Loader";
+import React, { forwardRef, useState } from "react";
+import { Carousel, Empty } from "antd";
+import Loader from "../Loader";
 import { DoctorCard, SearchFilter } from "./doctorsUtils";
-import doctorPhoto from "./../../../images/doctorPhoto.png";
-import { useDoctorsContext } from "../../../contexts/DoctorsContextProvider";
-import ServerError from "../../utils/ServerError";
-import PopUp from "../../utils/PopUp";
-import { useMediaQuery } from "react-responsive";
-import { useUserContext } from "../../../contexts/UserContextProvider";
-import { useUtilsContext } from "../../../contexts/UtilsContextProvider";
-import TableGrid from "../../utils/TableGrid";
+import doctorPhoto from "./../../images/doctorPhoto.png";
+import { useDoctorsContext } from "../../contexts/DoctorsContextProvider";
+import ServerError from "../utils/ServerError";
+import { useUserContext } from "../../contexts/UserContextProvider";
+import { useUtilsContext } from "../../contexts/UtilsContextProvider";
+import TableGrid from "../utils/TableGrid";
 
 const Doctors = forwardRef(({ home }, ref) => {
   const { socket, timeZone, isMobile } = useUtilsContext();

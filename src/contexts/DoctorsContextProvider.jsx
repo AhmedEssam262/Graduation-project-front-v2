@@ -12,7 +12,7 @@ const DoctorsContextProvider = ({ children, query, noFirstRender }) => {
     if (!noWaiting) setIsLoading(true);
     try {
       const { data } = await axios.request(
-        `http://127.0.0.1:8000/api/doctors${
+        `http://${host}:8000/api/doctors${
           query
             ? `?${query.total ? `total=${query.total}&` : ""}${
                 query.limit ? `limit=${query.limit}&` : ""

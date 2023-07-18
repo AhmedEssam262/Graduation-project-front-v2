@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import { useSlotsContext } from "../../../../contexts/SlotsContextProvider";
+import { useSlotsContext } from "../../../contexts/SlotsContextProvider";
 import { Button, Empty, Popover } from "antd";
-import { Link, useNavigate } from "react-router-dom";
-import Loader from "../../../Loader";
+import { useNavigate } from "react-router-dom";
+import Loader from "../../Loader";
 import DatePicker from "./DatePicker";
-import BookButton from "../../../bookAppointment/appointmentUtils/BookButton";
-import AppointmentPayment from "../../../bookAppointment/appointmentUtils/AppointmentPayment";
-import getStripe from "../../../bookAppointment/appointmentUtils/getStripe";
-import SuccessAppointment from "../../../bookAppointment/appointmentUtils/SuccessAppointment";
-import bookAppointment from "../../../bookAppointment/appointmentServices/bookAppointment";
-import PopUp from "../../../utils/PopUp";
-import { useUserContext } from "../../../../contexts/UserContextProvider";
-import { useUtilsContext } from "../../../../contexts/UtilsContextProvider";
+import BookButton from "../../bookAppointment/appointmentUtils/BookButton";
+import { useUserContext } from "../../../contexts/UserContextProvider";
 const BookCard = ({ doctorId, socket, timeZone, isPayment, setIsPayment }) => {
   const { slotsData, isLoading, fetchSlotsData } = useSlotsContext();
   const { messageApi, fetchUserData, userData } = useUserContext();
@@ -76,14 +70,16 @@ const BookCard = ({ doctorId, socket, timeZone, isPayment, setIsPayment }) => {
           e.stopPropagation();
           e.preventDefault();
         }}
-        className={`doctor--slots sm:w-1/3 xl:w-2/5 flex flex-col shadow-lg rounded bg-gray-200`}
+        className={`doctor--slots //sm:w-1/3 //xl:w-1/4 flex flex-col shadow-lg rounded bg-gray-200`}
       >
         <DatePicker
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
         />
         <div className="flex flex-col py-2 grow justify-center items-center">
-          {slotsData?.freeSlots?.length > 0 ? (
+          {slotsData?.freeSlots?.some(({ slotTime: value }) =>
+            isToday(value)
+          ) ? (
             <>
               <div
                 className="flex items-center justify-center flex-wrap rounded-md shadow-2xl p-2 grow gap-2 scroll--h scroll--v scroll--v--chat w-3/4"
@@ -103,21 +99,6 @@ const BookCard = ({ doctorId, socket, timeZone, isPayment, setIsPayment }) => {
                     },
                     i
                   ) =>
-                    //       <span
-                    //         key={value + i}
-                    //         className={`p-2 my-1 cursor-pointer text-center select-none rounded text-white font-medium
-                    // inline-block ${
-                    //   bookedSlot == value
-                    //     ? "bg-orange-700"
-                    //     : "hover:bg-gray-600 bg-gray-700"
-                    // }`}
-                    //         onClick={() =>
-                    //           setBookedSlot((val) => (val == value ? null : value))
-                    //         }
-                    //       >
-                    //         {value}
-                    //       </span>
-
                     isToday(value) && (
                       <div
                         className={`flex cursor-pointer flex-col relative rounded-lg 
@@ -190,7 +171,7 @@ const BookCard = ({ doctorId, socket, timeZone, isPayment, setIsPayment }) => {
                     );
                   }}
                   type="primary"
-                  className={`!my-4 m-auto sm:!font-medium !h-12 w-2/3 2xl:w-1/2 !block ${
+                  className={`!my-4 m-auto sm:!font-medium !h-12 w-2/3 !block ${
                     !bookedAppointment ||
                     !(userData && userData?.user_id != doctorId)
                       ? "!bg-gray-100 !text-gray-400 !bg-gray-200 !border-gray-400"

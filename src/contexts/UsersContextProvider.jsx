@@ -11,7 +11,7 @@ const UsersContextProvider = ({ children }) => {
     if (!notWaiting) setIsLoading(true);
     setIsError(false);
     try {
-      const { data } = await axios.request(`http://127.0.0.1:8000/api/users`, {
+      const { data } = await axios.request(`http://${host}:8000/api/users`, {
         timeout: 8000,
       });
       setUsersData(data?.data);

@@ -7,8 +7,8 @@ import React, {
   useRef,
   useState,
 } from "react";
-import HeaderLine from "../../../sign/signup/signupUtils/HeaderLine";
-import { DoctorOptions } from "../../../sign/signup/signupUtils/signData";
+import HeaderLine from "../../sign/signup/signupUtils/HeaderLine";
+import { DoctorOptions } from "../../sign/signup/signupUtils/signData";
 const opt = (val) => (val == "null" || !val ? null : val);
 const SearchFilter = forwardRef(({ fetchDoctorsData }, ref) => {
   const [searchFilter, setSearchFilter] = useState({

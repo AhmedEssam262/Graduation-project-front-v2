@@ -19,7 +19,7 @@ const submitMessage = async (
   setIsLoading(true);
   axios
     .post(
-      `http://127.0.0.1:8000/api/submit/message`,
+      `http://${host}:8000/api/submit/message`,
       {
         data,
       },

@@ -14,12 +14,14 @@ import { useUserContext } from "../../contexts/UserContextProvider";
 import UserProfile from "../user/profile/UserProfile";
 import UserManagment from "./adminUtils/UserManagment";
 import { useUtilsContext } from "../../contexts/UtilsContextProvider";
+import AdminReports from "./adminUtils/AdminReports";
+import ReportContextProvider from "../../contexts/ReportContextProvider";
 const AdminDashboard = () => {
   const isMobile = useMediaQuery({
     query: "(max-width:878px)",
   });
-  const { timeZone, userData: user, socket, messageApi } = useUtilsContext();
-  const { fetchUserData, isLoading } = useUserContext();
+  const { timeZone, socket, messageApi } = useUtilsContext();
+  const { fetchUserData, isLoading, userData: user } = useUserContext();
   const [activeMenu, setActiveMenu] = useState(false);
   const [dashType, setDashType] = useState(
     window.localStorage.getItem("adminDashType")
@@ -103,6 +105,10 @@ const AdminDashboard = () => {
                 userid={user?.user_id}
               />
             </ProfileContextProvider>
+          ) : dashType == "reports" ? (
+            <ReportContextProvider>
+              <AdminReports />
+            </ReportContextProvider>
           ) : null}
         </div>
       </div>

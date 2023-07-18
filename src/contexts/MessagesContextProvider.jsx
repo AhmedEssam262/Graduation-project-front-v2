@@ -33,7 +33,7 @@ const MessagesContextProvider = ({
     if (!noRender) setIsLoading(true);
     try {
       const { data } = await axios.request(
-        `http://127.0.0.1:8000/api/get/messages${handleQuery(query)}`,
+        `http://${host}:8000/api/get/messages${handleQuery(query)}`,
         {
           timeout: 10000,
           headers: {

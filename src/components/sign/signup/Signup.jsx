@@ -84,7 +84,7 @@ const checkUserName = (uname, setValidState) => {
   // setValidState("error");
   const host = window?.location?.hostname;
   axios
-    .get(`http://127.0.0.1:8000/api/chkuname/${uname}`)
+    .get(`http://${host}:8000/api/chkuname/${uname}`)
     .then(() => {
       if (uname) setValidState("success");
       // new user name
@@ -134,7 +134,7 @@ function Signup() {
       const host = window?.location?.hostname;
       axios
         .post(
-          `http://127.0.0.1:8000/api/adduser`,
+          `http://${host}:8000/api/adduser`,
           {
             data: values,
           },

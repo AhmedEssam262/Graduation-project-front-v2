@@ -23,7 +23,7 @@ const SlotsContextProvider = ({ children }) => {
     if (!noLoading) setIsLoading(true);
     try {
       const { data } = await axios.post(
-        `http://127.0.0.1:8000/api/get/slots`,
+        `http://${host}:8000/api/get/slots`,
         {
           data: postData,
         },

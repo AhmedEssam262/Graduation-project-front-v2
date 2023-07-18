@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import AppointmentShape from "../../bookAppointment/appointmentUtils/BookButton";
 import { useSlotsContext } from "../../../contexts/SlotsContextProvider";
 import { BiLoader } from "react-icons/bi";
 import { Empty } from "antd";
@@ -7,15 +6,13 @@ import scheduleAppointments from "../../doctorDashboard/dashboardServices/schedu
 import AppointmentCard from "../../doctorDashboard/dashboardUtils/scheduleUtils/AppointmentCard";
 import PopUp from "../../utils/PopUp";
 import { cancelAppointment } from "../../doctorDashboard/dashboardServices";
-import DatePicker from "../../user/doctors/doctorsUtils/DatePicker";
+import DatePicker from "../../doctors/doctorsUtils/DatePicker";
 import dayjs from "dayjs";
-const AppointmentDetails = ({
-  socket,
-  doctorId,
-  messageApi,
-  fetchUserData,
-  timeZone,
-}) => {
+import { useUtilsContext } from "../../../contexts/UtilsContextProvider";
+import { useUserContext } from "../../../contexts/UserContextProvider";
+const AppointmentDetails = ({ doctorId }) => {
+  const { timeZone, messageApi, socket } = useUtilsContext();
+  const { fetchUserData } = useUserContext();
   const [selectedDate, setSelectedDate] = useState({
     count: 0,
     date: dayjs().format("YYYY-MM-DD"),

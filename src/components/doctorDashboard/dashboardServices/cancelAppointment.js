@@ -32,7 +32,7 @@ const cancelAppointment = (
   });
   const host = window?.location?.hostname;
   axios
-    .post(`http://127.0.0.1:8000/api/cancel/appointment`, data, {
+    .post(`http://${host}:8000/api/cancel/appointment`, data, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${cookies.get("accessToken")}`,
@@ -50,20 +50,30 @@ const cancelAppointment = (
         doctorId,
       });
       setBookedSlot(null);
-      if (cancelFrom == "doctor" || cancelFrom == "admin") setShowPop(null);
-      if (cancelFrom == "doctor" || cancelFrom == "admin")
-        fetchData({
-          date: selectedDate?.format("YYYY-MM-DD"),
-          doctorId,
-        });
-      else
+      if (cancelFrom == "doctor" || cancelFrom == "admin") {
+        setShowPop(null);
+        if (cancelFrom == "doctor" || cancelFrom == "admin")
+          fetchData({
+            date: selectedDate?.format("YYYY-MM-DD"),
+            doctorId,
+          });
+      } else {
+        setShowPop({ data: false, show: false });
         fetchData(true, new Cookies().get("accessToken"), null, null, {
           date,
         });
+      }
     })
     .catch((err) => {
       if (err?.response?.status == 401) {
         fetchUserData(true, cookies.get("accessToken"));
+      } else if (err?.response?.status == 400) {
+        messageApi.open({
+          key: 1,
+          type: "error",
+          content: "it's already canceled or there's missing informations",
+          duration: 3,
+        });
       } else {
         messageApi.open({
           key: 1,

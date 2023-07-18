@@ -1,6 +1,6 @@
 import { GiDoctorFace, GiArchiveRegister } from "react-icons/gi";
 import { FcRatings } from "react-icons/fc";
-import { MdQuestionAnswer, MdReviews } from "react-icons/md";
+import { MdQuestionAnswer, MdReportProblem, MdReviews } from "react-icons/md";
 import { AiOutlineLogin } from "react-icons/ai";
 import { SiGnuprivacyguard } from "react-icons/si";
 import { HomeOutlined, LogoutOutlined } from "@ant-design/icons";
@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import SignBanner from "../../sign/SignBanner";
 import UserItem from "./UserItem";
 import { isMobile } from "react-device-detect";
-import { Avatar } from "antd";
+import { Avatar, Skeleton } from "antd";
 import { ImProfile } from "react-icons/im";
 function getItem(label, key, icon, children, type) {
   return {
@@ -438,22 +438,20 @@ const items = (
   user,
   messageApi,
   setUserData,
-  isMobile
+  isMobile,
+  isUserLoading
 ) => [
-  user
+  user || isUserLoading
     ? getItem(
-        <UserItem
-          setUserData={setUserData}
-          messageApi={messageApi}
-          user={user}
-          isMobile={isMobile}
-        />,
+        <UserItem isMobile={isMobile} />,
         // <div className="inline-block">logout</div>,
         //<Link to="/" className="select-none">
         //<div>{user.nick_name}</div>
         //</Link>
         "user",
-        user?.img_url ? (
+        isUserLoading ? (
+          <Skeleton.Avatar active />
+        ) : user?.img_url ? (
           <Avatar src={user?.img_url} size="small" />
         ) : (
           <ImProfile className="!text-2xl !text-gray-200 !m-0" />
@@ -469,7 +467,7 @@ const items = (
         <HomeOutlined className="!text-gray-300 hover:!text-white" />
       )
     : null,
-  !user
+  !user && !isUserLoading
     ? getItem(
         <Link to="/login" className="select-none">
           {t("Login")}
@@ -478,7 +476,7 @@ const items = (
         <AiOutlineLogin className="!text-gray-300 hover:!text-white" />
       )
     : null,
-  !user
+  !user && !isUserLoading
     ? getItem(
         <Link to="/signup" className="select-none">
           {t("SignUp")}
@@ -541,13 +539,13 @@ const items = (
     "5",
     <MdQuestionAnswer className="!text-gray-300 hover:!text-white" />
   ),
-  getItem(
-    <Link to="/ratings" className="select-none">
-      {t("Ratings")}
-    </Link>,
-    "6",
-    <FcRatings className="!text-gray-300 hover:!text-white" />
-  ),
+  // getItem(
+  //   <Link to="/ratings" className="select-none">
+  //     {t("Ratings")}
+  //   </Link>,
+  //   "6",
+  //   <FcRatings className="!text-gray-300 hover:!text-white" />
+  // ),
   getItem(
     <Link to="/feedbacks" className="select-none">
       {t("Feedbacks")}
@@ -555,6 +553,15 @@ const items = (
     "7",
     <MdReviews className="!text-gray-300 hover:!text-white" />
   ),
+  user
+    ? getItem(
+        <Link to="/report/problem" className="select-none">
+          {t("Report a problem")}
+        </Link>,
+        "report",
+        <MdReportProblem className="!text-gray-300 hover:!text-white" />
+      )
+    : null,
 ];
 
 export default items;

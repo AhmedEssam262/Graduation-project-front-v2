@@ -161,7 +161,6 @@ const DoctorManagment = ({ socket, timeZone }) => {
   const [openKey, setOpenKey] = useState();
   const [doctorRecord, setDoctorRecord] = useState();
   const [showPopUp, setShowPopUp] = useState();
-  console.log(doctorsData);
   const [isVerLoading, setIsLoading] = useState(false);
   const doctorsDetails = doctorsData?.map(
     (
@@ -260,13 +259,7 @@ const DoctorManagment = ({ socket, timeZone }) => {
               expandedRowRender: (record) => {
                 return (
                   <SlotsContextProvider>
-                    <AppointmentDetails
-                      socket={socket}
-                      timeZone={timeZone}
-                      fetchUserData={fetchUserData}
-                      messageApi={messageApi}
-                      doctorId={record?.key}
-                    />
+                    <AppointmentDetails doctorId={record?.key} />
                   </SlotsContextProvider>
                 );
               },

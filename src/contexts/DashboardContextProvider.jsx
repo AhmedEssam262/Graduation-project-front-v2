@@ -24,10 +24,13 @@ const DashboardContextProvider = ({ children, token }) => {
       return setIsLoading(false);
     }
     try {
-      const { data } = await axios.request(`http://127.0.0.1:8000/api/dashboard`, {
-        headers: { Authorization: `Bearer ${active ? directToken : token}` },
-        timeout: 10000,
-      });
+      const { data } = await axios.request(
+        `http://${host}:8000/api/dashboard`,
+        {
+          headers: { Authorization: `Bearer ${active ? directToken : token}` },
+          timeout: 10000,
+        }
+      );
       setDashboardData(data?.data);
       setIsLoading(false);
       return data;

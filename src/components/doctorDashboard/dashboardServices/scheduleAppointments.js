@@ -44,7 +44,7 @@ const scheduleAppointments = (
   const host = window?.location?.hostname;
   axios
     .post(
-      `http://127.0.0.1:8000/api/${
+      `http://${host}:8000/api/${
         isEdit ? "edit/appointment" : "schedule/appointments"
       }`,
       data,

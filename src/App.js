@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import {
@@ -12,6 +12,8 @@ import {
   DoctorDashboard,
   Loader,
   Chat,
+  Posts,
+  OnlineMeeting,
 } from "./components";
 import Footer from "./components/footer/Footer";
 import Cookies from "universal-cookie";
@@ -27,12 +29,11 @@ import {
 import { useUserContext } from "./contexts/UserContextProvider";
 import Appointments from "./components/appointments/Appointments";
 import AppointmentContextProvider from "./contexts/AppointmentContextProvider";
-import Posts from "./components/posts/Posts";
 import AppointmentPayment from "./components/bookAppointment/appointmentUtils/AppointmentPayment";
 import ServerError from "./components/utils/ServerError";
 import AdminDashboard from "./components/admin/AdminDashboard";
-import OnlineMeeting from "./components/onlineMeeting/OnlineMeeting";
 import { useUtilsContext } from "./contexts/UtilsContextProvider";
+import ReportProblem from "./components/reportProblem/ReportProblem";
 
 const cookies = new Cookies();
 const handleRoute = (element, permission, isLoading, isError) =>
@@ -53,8 +54,9 @@ const App = () => {
   const { lan } = useUtilsContext();
   // if (userData) window.localStorage.setItem("user", JSON.stringify(userData));
   const userAuth = userData;
-  console.log(userAuth);
+  
   return (
+    
     <div
       className={`overflow-x-hidden //scroll--h app flex flex-col min-h-screen`}
     >
@@ -154,6 +156,15 @@ const App = () => {
               element={handleRoute(
                 <AdminDashboard />,
                 userAuth?.user_type == "admin",
+                isLoading,
+                isError
+              )}
+            />
+            <Route
+              path="/report/problem"
+              element={handleRoute(
+                <ReportProblem />,
+                !!userAuth?.user_type,
                 isLoading,
                 isError
               )}

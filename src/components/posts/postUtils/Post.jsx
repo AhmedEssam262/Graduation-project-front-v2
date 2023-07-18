@@ -33,7 +33,7 @@ let timeId;
 const getLike = async (setIsLike, postId, commentId) => {
   const host = window.location.hostname;
   const { data } = await axios(
-    `http://127.0.0.1:8000/api/get/like?postId=${postId}${
+    `http://${host}:8000/api/get/like?postId=${postId}${
       commentId ? `&commentId=${commentId}` : ""
     }`,
     {
@@ -239,7 +239,7 @@ const CommentActions = ({
               onClick={() => {
                 fetchCommentsData({
                   postId,
-                  limit: lenViewedComments + 5,
+                  limit: lenViewedComments + 2,
                 });
                 if (!isComment) setShowPost(postId);
               }}
@@ -729,12 +729,25 @@ const Post = ({
             )
           );
         } else {
+          const reply_on = data?.reply_on;
           if (
             !commentsData?.some(
               ({ comment_id }) => comment_id == data?.comment_id
             )
           ) {
-            setCommentsData((c) => (c ? [data, ...c] : [data]));
+            setCommentsData((c) =>
+              c?.length
+                ? [
+                    data,
+                    ...c.map((c1) =>
+                      c1.comment_id == reply_on
+                        ? { ...c1, num_replies: c1.num_replies + 1 }
+                        : c1
+                    ),
+                  ]
+                : [data]
+            );
+            console.log(commentsData, data.reply_on);
             setLen((val) => val + 1);
           }
         }

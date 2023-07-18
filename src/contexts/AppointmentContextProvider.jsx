@@ -33,7 +33,7 @@ const AppointmentContextProvider = ({ children, token, isDoctor }) => {
     try {
       if (done) {
         const { data } = await axios.post(
-          `http://127.0.0.1:8000/api/done/appointments${
+          `http://${host}:8000/api/update/appointment${
             isDoctor || query?.doctor
               ? `?doctor=true${query.date && `&date=${query.date}`}`
               : `?date=${query?.date}`
@@ -51,7 +51,7 @@ const AppointmentContextProvider = ({ children, token, isDoctor }) => {
         return data;
       } else {
         const { data } = await axios.request(
-          `http://127.0.0.1:8000/api/get/appointments?${
+          `http://${host}:8000/api/get/appointments?${
             query?.date ? `&date=${query?.date}` : ""
           }${query?.doctorId ? `&doctor_id=${query?.doctorId}` : ""}${
             isDoctor || query?.doctor ? `&doctor=true` : ""

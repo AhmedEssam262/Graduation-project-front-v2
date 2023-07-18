@@ -8,11 +8,7 @@ import { cancelAppointment } from "../doctorDashboard/dashboardServices";
 import dayjs from "dayjs";
 import AppointmentTime from "./appointmentUtils/AppointmentTime";
 import { Link } from "react-router-dom";
-import {
-  StopOutlined,
-  VideoCameraFilled,
-  VideoCameraOutlined,
-} from "@ant-design/icons";
+import { VideoCameraOutlined } from "@ant-design/icons";
 import { ImCancelCircle } from "react-icons/im";
 import PopUp from "../utils/PopUp";
 import {
@@ -20,7 +16,7 @@ import {
   ClockCircleOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
-import DatePicker from "../user/doctors/doctorsUtils/DatePicker";
+import DatePicker from "../doctors/doctorsUtils/DatePicker";
 import Cookies from "universal-cookie";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaClinicMedical } from "react-icons/fa";
@@ -427,9 +423,9 @@ const Appointments = ({ fromDash }) => {
         <PopUp
           show={showPop?.show}
           handleClose={() => {
-            setShowPop((val) => ({ ...val, show: false }));
+            setShowPop((val) => ({ data: val?.data, show: false }));
             setTimeout(
-              () => setShowPop((val) => ({ ...val, data: null })),
+              () => setShowPop((val) => ({ show: false, data: null })),
               400
             );
           }}
@@ -463,7 +459,7 @@ const Appointments = ({ fromDash }) => {
                   "patient",
                   fetchUserData,
                   selectedDate.date,
-                  null,
+                  setShowPop,
                   socket
                 );
               }}

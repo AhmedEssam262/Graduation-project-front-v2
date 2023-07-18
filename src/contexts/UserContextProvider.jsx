@@ -30,7 +30,7 @@ const UserContextProvider = ({ children, token }) => {
     }
     try {
       if (directError) throw directError;
-      const { data } = await axios.request(`http://127.0.0.1:8000/api/user`, {
+      const { data } = await axios.request(`http://${host}:8000/api/user`, {
         headers: { Authorization: `Bearer ${active ? directToken : token}` },
         timeout: 10000,
       });

@@ -26,7 +26,7 @@ const CommentsContextProvider = ({ children, noFirstRender, query }) => {
     if (!noRender) setIsLoading(true);
     try {
       const { data } = await axios.request(
-        `http://127.0.0.1:8000/api/get/comments${handleQuery(query)}`,
+        `http://${host}:8000/api/get/comments${handleQuery(query)}`,
         {
           timeout: 10000,
         }

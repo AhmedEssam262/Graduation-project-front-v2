@@ -13,7 +13,7 @@ import LangItem from "./navbarUtils/LangItem";
 const { Title, Item } = { ...Typography, ...Menu };
 const Navbar = ({ DoctorRef }) => {
   const { messageApi, lan, t } = useUtilsContext();
-  const { setUserData, userData: user } = useUserContext();
+  const { setUserData, userData: user, isLoading } = useUserContext();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({
     query: "(max-width:678px)",
@@ -55,7 +55,7 @@ const Navbar = ({ DoctorRef }) => {
       <div
         ref={navElement}
         className={`
-      ${isMobile ? "relative bg-gray-800" : "fixed h-full"}
+      ${isMobile ? "relative bg-gray-800" : "flex flex-col fixed h-full"}
       navbar--container app--navbar z-20`}
         style={{
           marginLeft: `${!isMobile ? -navWidth : 0}px`,
@@ -187,9 +187,11 @@ const Navbar = ({ DoctorRef }) => {
           ref={menuElement}
           theme="dark"
           mode={!isMobile ? "inline" : "vertical"}
-          className={`navbar--menu ${isMobile ? "sm" : ""} ${
-            lan == "ar" ? "ar--nav" : ""
-          } ${isMobile ? "top-full absolute" : ""}`}
+          className={`navbar--menu ${lan == "ar" ? "ar--nav" : ""} ${
+            isMobile
+              ? "top-full absolute sm"
+              : "!overflow-x-hidden !overflow-y-auto"
+          }`}
           style={{
             paddingInline: "5px",
             height: `
@@ -216,7 +218,8 @@ const Navbar = ({ DoctorRef }) => {
             user,
             messageApi,
             setUserData,
-            isMobile
+            isMobile,
+            isLoading
           )}
           onClick={toggle}
         ></Menu>

@@ -24,7 +24,9 @@ const FeedbackContextProvider = ({
     if (!noLoading) setIsLoading(true);
     try {
       const { data } = await axios.request(
-        `http://127.0.0.1:8000/api/get/feedback${handleQuery(query || contextQuery)}`,
+        `http://${host}:8000/api/get/feedback${handleQuery(
+          query || contextQuery
+        )}`,
         { timeout: 8000 }
       );
       setFeedbackData(data?.data);
